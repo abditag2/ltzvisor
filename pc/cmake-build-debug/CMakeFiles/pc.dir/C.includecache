@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/fardin/devel/pc/pc.c
+errno.h
+-
+fcntl.h
+-
+string.h
+-
+termios.h
+-
+unistd.h
+-
+stdio.h
+-
+

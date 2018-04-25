@@ -1,0 +1,3 @@
+/home/fardin/devel/pc/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/fardin/devel/pc/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/fardin/devel/pc/cmake-build-debug/CMakeFiles/pc.dir

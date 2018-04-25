@@ -201,7 +201,12 @@ board is configured to boot from the SD card.
 		`fatload mmc 0 0x1C000000 LTZVisor.bin`
 		
 		`go 0x1C000000` 
-	
+
+mmcinfo
+fatload mmc 0 0x1C000000 LTZVisor.bin
+go 0x1C000000
+
+
 	- Zybo Zynq-7000 ARM/FPGA SoC Trainer Board:
  
 		`mmcinfo`

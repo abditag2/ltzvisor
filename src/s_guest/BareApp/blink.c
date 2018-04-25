@@ -46,26 +46,92 @@
 
 #include<hw_zynq.h>
 #include<printk.h>
+#include <zynq_uart.h>
 
-void led_blink( void * pvParameters );
+void led_blink(void *pvParameters);
 
 int main() {
 
-	/** Initialize hardware */
-	hw_init();
+    /** Initialize hardware */
+    hw_init();
 
-	printk(" * Secure bare metal VM: running ... \n\t");
+//    printk(" * Secure bare metal VM: running ... \n\t");
 
-	/** Generate tick every 1s */
-	tick_set(1000000);
+    /** Generate tick every 1s */
+    tick_set(200000);
 
-	/* Calling Blinking Task (LED blink at 1s) */
-	led_blink((void*)0);
+    /* Calling Blinking Task (LED blink at 1s) */
+    led_blink((void *) 0);
 
-	/* This point will never be reached */
-	for( ;; );
+    /* This point will never be reached */
+    for (;;);
 
 }
+
+
+int write_to_serial(int double_volts[]) {
+
+    int voltages[2];
+    unsigned char Txbuffer[10];
+    char i = 0;
+    Txbuffer[0] = 0xCC; // End Byte
+    Txbuffer[9] = 0xFF; // Start Byte
+
+    voltages[0] = double_volts[0];
+    voltages[1] = double_volts[1];
+
+    for (i = 0; i < 2; i++) {
+
+        Txbuffer[4 * i + 1] = (char) (voltages[i] & 0xff); /* first byte */
+        Txbuffer[4 * i + 2] = (char) (voltages[i] >> 8 & 0xff); /* second byte */
+        Txbuffer[4 * i + 3] = (char) (voltages[i] >> 16 & 0xff); /* third byte */
+        Txbuffer[4 * i + 4] = (char) (voltages[i] >> 24 & 0xff); /* fourth byte */
+
+    }
+    int k = 0;
+    for (i = 0; i < 10; i ++){
+//        printk(" c %d is %x ", i, Txbuffer[i]);
+        uart_putc(1, Txbuffer[i]);
+
+        k = 0;
+        while (k < 10000){
+            k = k + 1;
+        }
+    }
+
+    return k;
+}
+
+
+void read_from_serial(int *sensor_readings) {
+
+    char rxChar1[13];
+//    int tmpSend[2];
+
+    while (1) {
+
+        char rxChar;
+        rxChar = 0xAA;
+        uart_putc(1, rxChar);
+
+        int i = 0;
+        for (i = 0; i < 13; i++) {
+            rxChar1[i] = uart_getc(1);
+        }
+
+        sensor_readings[0] = *(unsigned int *) &rxChar1[0];
+        sensor_readings[1] = *(unsigned int *) &rxChar1[4];
+        sensor_readings[2] = *(unsigned int *) &rxChar1[8];
+//        tmpSend[0] = (double) sensor_readings[0];
+//        tmpSend[1] = (double) sensor_readings[1];
+        //write_to_serial(tmpSend);
+        break;
+
+    }
+
+    return;
+}
+
 
 /**
  * Blink LED "Task"
@@ -74,15 +140,31 @@ int main() {
  *
  * @retval 	
  */
-void led_blink( void * parameters ){
+void led_blink(void *parameters) {
 
-	static uint32_t toggle;
-	/** 4GPIO (LED) in FPGA fabric */
-	static uint32_t *ptr = (uint32_t *) 0x41200000;
+    static uint32_t toggle;
+    /** 4GPIO (LED) in FPGA fabric */
+    static uint32_t *ptr = (uint32_t *) 0x41200000;
 
-	for( ;; ){
-		toggle ^=0xFF;
-		*ptr = toggle;
-		YIELD()
-	}
+    int double_volts[2];
+    int sensors[3];
+
+    double_volts[0] = 1;
+    double_volts[1] = 3;
+
+    sensors[0] = 1;
+    sensors[1] = 2;
+    sensors[2] = 3;
+
+    for (;;) {
+        write_to_serial(double_volts);
+//        read_from_serial(sensors);
+
+        double_volts[0] += 1;
+        double_volts[1] += 1;
+
+        toggle ^= 0xFF;
+        *ptr = toggle;
+        YIELD()
+    }
 }
