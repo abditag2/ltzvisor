@@ -47,6 +47,7 @@
 #include <hw_zynq.h>
 #include <printk.h>
 #include <zynq_uart.h>
+#include <math.h>
 
 
 #include "blink.h"
@@ -101,6 +102,18 @@ void write_to_serial(int float_volts[]) {
     return;
 }
 
+#define PI 3.14159265f
+
+float cos(float x){
+    if( x < 0.0f )
+        x = -x;
+    while( PI < x )
+        x -= 2*PI;
+    return 1.0f - (x*x/2.0f)*( 1.0f - (x*x/12.0f) * ( 1.0f - (x*x/30.0f) * (1.0f - x*x/56.0f )));
+}
+
+float sin(float x)
+{return cos(x-PI/2);}
 
 void matrix_mult(double A[HX_SIZE][6], double B[6][1], int m, int n, int k) {
 
@@ -267,13 +280,13 @@ struct state eval_state(struct state state_x, struct command U) {
     d_state.elevation = state_x.d_elevation;
     d_state.pitch = state_x.d_pitch;
     d_state.travel = state_x.d_travel;
-    d_state.d_elevation = P[0] * cosi(state_x.elevation) + P[1] * sini(state_x.elevation) + P[2] * state_x.d_travel +
-                          P[7] * cosi(state_x.pitch) * (U.u1 + U.u2);
+    d_state.d_elevation = P[0] * cos(state_x.elevation) + P[1] * sin(state_x.elevation) + P[2] * state_x.d_travel +
+                          P[7] * cos(state_x.pitch) * (U.u1 + U.u2);
 
     d_state.d_pitch =
-            P[4] * sini(state_x.pitch) + P[3] * cosi(state_x.pitch) + P[5] * state_x.d_pitch + P[8] * (U.u1 - U.u2);
+            P[4] * sin(state_x.pitch) + P[3] * cos(state_x.pitch) + P[5] * state_x.d_pitch + P[8] * (U.u1 - U.u2);
 
-    d_state.d_travel = P[6] * state_x.d_travel + P[9] * sini(state_x.pitch) * (U.u1 + U.u2);
+    d_state.d_travel = P[6] * state_x.d_travel + P[9] * sin(state_x.pitch) * (U.u1 + U.u2);
 
     state_x.elevation += SIM_STEP * d_state.elevation;
     state_x.pitch += SIM_STEP * d_state.pitch;
