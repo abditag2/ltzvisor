@@ -10,7 +10,7 @@ set_interface_attribs(int fd, int speed, int parity) {
     struct termios tty;
     memset(&tty, 0, sizeof tty);
     if (tcgetattr(fd, &tty) != 0) {
-        printf("error %d from tcgetattr", errno);
+//        printf("error %d from tcgetattr", errno);
         return -1;
     }
 
@@ -37,7 +37,7 @@ set_interface_attribs(int fd, int speed, int parity) {
     tty.c_cflag &= ~CRTSCTS;
 
     if (tcsetattr(fd, TCSANOW, &tty) != 0) {
-        printf("error %d from tcsetattr", errno);
+//        printf("error %d from tcsetattr", errno);
         return -1;
     }
     return 0;

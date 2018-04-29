@@ -1,13 +1,26 @@
 // Stanley Bak
 // 4-2014
 
-#include <stdio.h>
 #include <float.h>
-#include <math.h>
-#include <stdlib.h>
+#include "inc/face_lift.h"
 
-#include "face_lift.h"
-#include "util.h"
+// just for debug
+static LiftingSettings errorPrintParams;
+static bool errorParamsAssigned = false;
+
+void set_error_print_params(LiftingSettings* set)
+{
+    errorParamsAssigned = true;
+    errorPrintParams = *set;
+}
+
+
+double fabs(double x){
+    if (x < 0 ){
+        x = -x;
+    }
+    return x;
+}
 
 // make a face's neighborhood of a given width
 void make_neighborhood_rect(HyperRectangle* out, int f,
@@ -76,7 +89,6 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 
 		for (int f = 0; f < NUM_FACES; ++f)
 		{
-
 
 			int dim = f / 2;
 			bool isMin = (f % 2) == 0;
@@ -154,7 +166,9 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 		//printf(": minNebCrossTime = %f, stepSize = %f\n", minNebCrossTime, stepSize);
 		//printf(": debugNumCalls = %i\n", debugNumCalls);
 
-		error_exit("minNebCrossTime is less than half of step size.");
+//		printk("minNebCrossTime is less than half of step size.");
+		return -1000;
+
 	}
 
 	//printf("\n");
@@ -183,10 +197,18 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 		//printf("rect = ");
 		//println(&debug_initialRect);
 
-		error_exit("lifted rect is outside of bloated rect");
+//		printk("lifted rect is outside of bloated rect");
+		return -1000;
+
 	}
 
 	return timeToElapse;
+}
+
+
+int ceil(double num) {
+    int inum = (int)num;
+    return inum;
 }
 
 // generate a split rectangle
@@ -196,8 +218,10 @@ void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 	for (int dimIndex = 0; dimIndex < NUM_DIMS; ++dimIndex)
 	{
 		int mask = splitDimensions[dimIndex];
-		int splitNum = iteratorVal % mask;
-		iteratorVal /= mask;
+//		int splitNum = iteratorVal % mask;
+
+        int splitNum = iteratorVal - (mask * (int) ((double) iteratorVal/ (double)mask) );
+		iteratorVal = (int) ((double) iteratorVal / (double) mask);
 
 		double width = interval_width(&rectToSplit->dims[dimIndex]) / splitDimensions[dimIndex];
 
@@ -211,11 +235,12 @@ void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 
 
 
-bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings, double stressSoFar, double* maxOr) {
 
-	bool rv = false;
-	bool lastIterationSafe = false;
-	HyperRectangle finalTrackedRect;
+bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings) {
+
+//	bool rv = false;
+//	bool lastIterationSafe = false;
+//	HyperRectangle finalTrackedRect;
 
 	set_error_print_params(settings);
 
@@ -240,9 +265,9 @@ bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings, 
 		// if we're not even close to the desired step size
 		if (hyperrectange_max_width(&trackedRect) > settings->maxRectWidthBeforeError)
 		{
-			printf("maxRectWidthBeforeError exceeded at time %f, rect = ",
-				   settings->reachTimeCC - timeRemaining);
-			println(&trackedRect);
+//			printf("maxRectWidthBeforeError exceeded at time %f, rect = ",
+//				   settings->reachTimeCC - timeRemaining);
+//			println(&trackedRect);
 			// step size is too large, make it smaller and recompute
 			safe = false;
 		}

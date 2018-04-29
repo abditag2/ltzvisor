@@ -75,4 +75,4 @@ add_executable(ltzvisor
         src/s_guest/BareApp/portable/inc/s_isr.h
         src/s_guest/BareApp/portable/hw_zynq.c
         src/s_guest/BareApp/portable/s_isr.c
-        src/s_guest/BareApp/blink.c src/s_guest/BareApp/blink.h)
+        src/s_guest/BareApp/blink.c src/s_guest/BareApp/blink.h src/s_guest/BareApp/inc/params.h)

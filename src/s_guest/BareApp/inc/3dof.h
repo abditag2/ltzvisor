@@ -12,11 +12,17 @@
 double potential(double e, double p, double y, double de, double dp, double dy);
 
 // check if the passed-in state is provably safe
-bool isSafe(double state[NUM_DIMS], double reachTimeCC, double reachTimeSC, double* simTime, double stressSoFar, double * maxOR);
+bool isSafe(double state[NUM_DIMS], double reachTimeCC, double reachTimeSC,
+            double *simTime);
+
 double findMaxRestartTime(double state[NUM_DIMS]);
+
 double getSimulatedSafeTime(double start[NUM_DIMS], double reachTimeCC);
-bool shouldStop(double state[NUM_DIMS], double simTime, void* p);
+
+bool shouldStop(double state[NUM_DIMS], double simTime, void *p);
+
 bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p);
+
 void prvSeiRestartTask(void *pvParameters);
 
 #endif

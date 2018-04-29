@@ -8,8 +8,9 @@
 #include <stdbool.h>
 
 // pick the dynamics header to compile (this defines NUM_DIMS)
-#include "dynamics_3dof.h"
+//#include "dynamics_3dof.h"
 
+#define NUM_DIMS (6)
 #define NUM_FACES (2 * NUM_DIMS)
 
 typedef struct Interval

@@ -191,6 +191,7 @@ cflags= -O0 -Wall -fno-common -msoft-float -mno-thumb-interwork -marm -nostdlib 
 ifeq ($(DEBUG), y)
 	cflags += -g
 endif
+
 ifeq ($(CONFIG_NEON_SUPPORT), y)
 	cflags+= -mfloat-abi=softfp -mfpu=neon
 endif

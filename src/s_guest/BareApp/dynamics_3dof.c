@@ -1,9 +1,5 @@
-#include "dynamics.h"
-#include "util.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "inc/dynamics_3dof.h"
+#include "inc/util.h"
 
 #ifdef DYNAMICS_PENDULUM
 
@@ -174,10 +170,7 @@ int control_commands(double (*commands)[2], double point[], int controller_type)
         double com2 =K[1][0] * point[0] + K[1][1] * point[1] + K[1][2] * point[2] + K[1][3] * point[3] + K[1][4] * point[4] +
                      K[1][5] * point[5];
 
-
         commands[0][1] = com2;
-
-//        printf("commands0 %f, commands1: %f\n", com1, com2);
 
         if (com1 > U_MAX)
             commands[0][0] = U_MAX;
@@ -205,8 +198,6 @@ double get_derivative_bounds(HyperRectangle *rect, int faceIndex, int controller
     bool isMin = (faceIndex % 2) == 0;
 
     double rv = 0;
-    if (dim >= 6)
-        error_exit("dimension index out of bounds in getDerivativeBounds");
 
     double points[256][6];
     int number_of_points = fill_in_the_critical_points_3dof(points, rect);
@@ -215,10 +206,6 @@ double get_derivative_bounds(HyperRectangle *rect, int faceIndex, int controller
 
     int num_commands = control_commands(commands, points[0], controller_type);
     rv = eval_dim_with_controller_with_commad(dim, points[0], commands[0]);
-
-    if (controller_type == SIMPLE_CONTROLLER){
-        double dd = 44;
-    }
 
     for (int i = 0; i < number_of_points; ++i) {
 

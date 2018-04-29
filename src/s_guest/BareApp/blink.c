@@ -47,17 +47,15 @@
 #include <hw_zynq.h>
 #include <printk.h>
 #include <zynq_uart.h>
-#include <math.h>
-
-
 #include "blink.h"
+#include "inc/3dof.h"
+#include "types.h"
 
 void led_blink(void *pvParameters);
 
 
 float vol_right = 0;
 float vol_left = 0;
-
 
 float add_left = 0;
 float add_right = 0;
@@ -102,18 +100,6 @@ void write_to_serial(int float_volts[]) {
     return;
 }
 
-#define PI 3.14159265f
-
-float cos(float x){
-    if( x < 0.0f )
-        x = -x;
-    while( PI < x )
-        x -= 2*PI;
-    return 1.0f - (x*x/2.0f)*( 1.0f - (x*x/12.0f) * ( 1.0f - (x*x/30.0f) * (1.0f - x*x/56.0f )));
-}
-
-float sin(float x)
-{return cos(x-PI/2);}
 
 void matrix_mult(double A[HX_SIZE][6], double B[6][1], int m, int n, int k) {
 
@@ -273,62 +259,6 @@ float hx[HX_SIZE][1] = {
         {0.242119f},
 };
 
-struct state eval_state(struct state state_x, struct command U) {
-
-    struct state d_state;
-
-    d_state.elevation = state_x.d_elevation;
-    d_state.pitch = state_x.d_pitch;
-    d_state.travel = state_x.d_travel;
-    d_state.d_elevation = P[0] * cos(state_x.elevation) + P[1] * sin(state_x.elevation) + P[2] * state_x.d_travel +
-                          P[7] * cos(state_x.pitch) * (U.u1 + U.u2);
-
-    d_state.d_pitch =
-            P[4] * sin(state_x.pitch) + P[3] * cos(state_x.pitch) + P[5] * state_x.d_pitch + P[8] * (U.u1 - U.u2);
-
-    d_state.d_travel = P[6] * state_x.d_travel + P[9] * sin(state_x.pitch) * (U.u1 + U.u2);
-
-    state_x.elevation += SIM_STEP * d_state.elevation;
-    state_x.pitch += SIM_STEP * d_state.pitch;
-    state_x.travel += SIM_STEP * d_state.travel;
-    state_x.d_elevation += SIM_STEP * d_state.d_elevation;
-    state_x.d_pitch += SIM_STEP * d_state.d_pitch;
-    state_x.d_travel += SIM_STEP * d_state.d_travel;
-
-    return state_x;
-}
-
-
-int check_safety(struct state x) {
-
-    float X[6][1] = {{x.elevation},
-                      {x.pitch},
-                      {x.travel},
-                      {x.d_elevation},
-                      {x.d_pitch},
-                      {x.d_travel}};
-
-    matrix_mult(Hx, X, HX_SIZE, 1, 6);
-
-    int all_small = 1;
-    int k = 0;
-    for (k = 0; k < HX_SIZE; k++) {
-        if (C[k][0] > hx[k][0]) {
-
-            all_small = 0;
-
-            break;
-        }
-
-    }
-
-    //  if (x.elevation+0.333*x.pitch > -0.3 && x.elevation-0.333*x.pitch>-0.3  && x.elevation < 0.35 && x.d_elevation > -0.3 && x.d_elevation < 0.4  && x.d_pitch > -1.3 && x.d_pitch < 1.3)
-    if (all_small == 1)
-        return 1;
-    else
-        return 0;
-}
-
 
 struct command controller_safety(struct state sp, struct state x, struct controller_storage* cs){
 
@@ -370,82 +300,6 @@ struct command controller_safety(struct state sp, struct state x, struct control
 }
 
 
-struct state simulate_fixed_control(struct state init_state, struct command U, float time) {
-
-    struct state state_x;
-
-    state_x = init_state;
-
-    int steps = time / SIM_STEP;
-    int k = 0;
-    for (k = 0; k < steps; k++) {
-
-        state_x = eval_state(state_x, U);
-
-        if (check_safety(state_x) == 0) {
-            state_x.safe = 0;
-
-            return state_x;
-        }
-    }
-    state_x.safe = 1;
-
-
-    return state_x;
-}
-
-struct state simulate_with_controller(struct state init_state, float time) {
-
-    struct state state_x;
-
-    state_x = init_state;
-
-    int steps = time / SIM_STEP;
-
-    struct controller_storage cs;
-    cs.int_elevation = 0;
-    cs.int_pitch = 0;
-    cs.int_travel = 0;
-
-    int k = 0;
-
-    for (k = 0; k < steps; k++) {
-        struct command U = controller_safety(sps, state_x, &cs);
-        state_x = eval_state(state_x, U);
-        if (check_safety(state_x) == 0) {
-
-            state_x.safe = 0;
-
-            return state_x;
-
-        }
-
-        state_x.safe = 1;
-    }
-
-    return state_x;
-
-}
-
-
-//The outcome determines weather the safety controller should be used or not
-int decide(struct state current_state, struct command U, float time) {
-    //struct state x2 = simulate_fixed_control(current_state, U, time);
-    struct state x2 = simulate_fixed_control(current_state, U, RESTART_TIME);
-    // struct state x10;
-    if (x2.safe == 0)
-        return 0;
-
-    struct state x10 = simulate_with_controller(x2, 1);
-
-    if (x2.safe == 1 && x10.safe == 1)
-        return 1;
-    else
-        return 0;
-
-}
-
-
 /**
  * Blink LED "Task"
  *
@@ -473,6 +327,9 @@ void led_blink(void *parameters) {
 
 //        read_from_serial(sensors);
 //        write_to_serial(float_volts);
+        double state[6] = {1,1,1,1,1,1};
+
+        double restart_time = findMaxRestartTime(state);
 
         char cc = uart_getc(1);
         printk("cc is %c\n", cc);
