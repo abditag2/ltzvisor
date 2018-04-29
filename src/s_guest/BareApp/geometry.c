@@ -6,7 +6,7 @@
  */
 
 #include "inc/geometry.h"
-#include <float.h>
+#include <stdio.h>
 
 double interval_width(Interval* i)
 {
@@ -22,7 +22,7 @@ double hyperrectange_max_width(HyperRectangle* rect)
 		double min = rect->dims[d].min;
 		double max = rect->dims[d].max;
 		double dif = max - min;
-
+//
 //		if (!isfinite(min) || !isfinite(max) || !isfinite(dif))
 //		{
 //			rv = DBL_MAX;
@@ -45,12 +45,16 @@ bool hyperrectangle_contains(HyperRectangle* outside, HyperRectangle* inside, bo
 		if ((inside->dims[d].min < outside->dims[d].min) || (inside->dims[d].max > outside->dims[d].max))
 		{
 			if (printErrors && (inside->dims[d].min < outside->dims[d].min))
-//				printf("inside->dim[%d].min (%f) < outside->dim[%d].min (%f)\n",
-//						d, inside->dims[d].min, d, outside->dims[d].min);
+#ifdef DEBUG_FARDIN
+				printf("inside->dim[%d].min (%f) < outside->dim[%d].min (%f)\n",
+						d, inside->dims[d].min, d, outside->dims[d].min);
+#endif
                 ;
 			else if (printErrors)
-//				printf("inside->dim[%d].max (%f) < outside->dim[%d].max (%f)\n",
-//						d, inside->dims[d].max, d, outside->dims[d].max);
+#ifdef DEBUG_FARDIN
+				printf("inside->dim[%d].max (%f) < outside->dim[%d].max (%f)\n",
+						d, inside->dims[d].max, d, outside->dims[d].max);
+#endif
 
 			rv = false;
 			break;
@@ -70,17 +74,6 @@ void hyperrectangle_grow_to_convex_hull(HyperRectangle* grower, HyperRectangle* 
 		if (contained->dims[d].max > grower->dims[d].max)
 			grower->dims[d].max = contained->dims[d].max;
 	}
-}
-
-void print(HyperRectangle* r)
-{
-//	printf("[HyperRectangle");
-
-	for (int d=0; d < NUM_DIMS; ++d)
-//		printf(" (%f, %f)", r->dims[d].min, r->dims[d].max);
-		;
-
-//	printf("]");
 }
 
 

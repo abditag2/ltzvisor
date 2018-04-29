@@ -1,5 +1,5 @@
-#include "inc/dynamics_3dof.h"
-#include "inc/util.h"
+#include "inc/dynamics.h"
+
 
 #ifdef DYNAMICS_PENDULUM
 
@@ -16,31 +16,6 @@ static const double K[2][6] =
 
 
 int numDerivativeBoundsCalls = 0;
-
-
-double eval_ORFunction(double state[]) {
-    double u = 0;
-    double rv = 0;
-
-    return rv;
-}
-
-double find_F_max(HyperRectangle *rect) {
-    double points[256][NUM_DIMS];
-    int number_of_points = fill_in_the_critical_points_3dof(points, rect);
-
-    double rv = 0;
-    rv = eval_ORFunction(points[0]);
-
-    for (int i = 1; i < number_of_points; ++i) {
-        double val = eval_ORFunction(points[i]);
-
-        if (val > rv)
-            rv = val;
-    }
-
-    return rv;
-}
 
 
 int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect) {
@@ -98,20 +73,20 @@ int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect) 
 
 double eval_dim_with_controller_with_commad(int dim, double state[], double command[]) {
 
-    double p1 = -1.0000;
-    double p2 = -2.4000;
-    double p3 = -0.0943;
-    double p4 = 0.1200;
-    double p5 = 0.1200;
-    double p6 = -2.5000;
-    double p7 = -0.0200;
+//    double p1 = -1.0000;
+//    double p2 = -2.4000;
+//    double p3 = -0.0943;
+//    double p4 = 0.1200;
+//    double p5 = 0.1200;
+//    double p6 = -2.5000;
+//    double p7 = -0.0200;
     double p8 = 0.200;
     double p9 = 2.1000;
-    double p10 = 10.0000;
+//    double p10 = 10.0000;
 
-    double e = state[0];
-    double p = state[1];
-    double y = state[2];
+//    double e = state[0];
+//    double p = state[1];
+//    double y = state[2];
     double de = state[3];
     double dp = state[4];
     double dy = state[5];
@@ -170,7 +145,10 @@ int control_commands(double (*commands)[2], double point[], int controller_type)
         double com2 =K[1][0] * point[0] + K[1][1] * point[1] + K[1][2] * point[2] + K[1][3] * point[3] + K[1][4] * point[4] +
                      K[1][5] * point[5];
 
+
         commands[0][1] = com2;
+
+//        printf("commands0 %f, commands1: %f\n", com1, com2);
 
         if (com1 > U_MAX)
             commands[0][0] = U_MAX;

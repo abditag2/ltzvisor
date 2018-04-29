@@ -8,9 +8,8 @@
 #include <stdbool.h>
 
 // pick the dynamics header to compile (this defines NUM_DIMS)
-//#include "dynamics_3dof.h"
+#include "dynamics_3dof.h"
 
-#define NUM_DIMS (6)
 #define NUM_FACES (2 * NUM_DIMS)
 
 typedef struct Interval
@@ -37,8 +36,5 @@ bool hyperrectangle_contains(HyperRectangle* outside, HyperRectangle* inside, bo
 void hyperrectangle_grow_to_convex_hull(HyperRectangle* grower, HyperRectangle* contained);
 double hyperrectange_max_width(HyperRectangle* rect);
 void hyperrectangle_bloat(HyperRectangle* out, double from[NUM_DIMS], double width);
-
-//void print(HyperRectangle* r);
-//void println(HyperRectangle* r);
 
 #endif

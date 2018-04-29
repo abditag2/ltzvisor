@@ -1,25 +1,17 @@
 // Stanley Bak
 // 4-2014
 
-#include <float.h>
+#include <stdio.h>
+
 #include "inc/face_lift.h"
-
-// just for debug
-static LiftingSettings errorPrintParams;
-static bool errorParamsAssigned = false;
-
-void set_error_print_params(LiftingSettings* set)
-{
-    errorParamsAssigned = true;
-    errorPrintParams = *set;
-}
 
 
 double fabs(double x){
-    if (x < 0 ){
-        x = -x;
-    }
-    return x;
+	if (x < 0){
+		x = -x;
+	}
+
+	return x;
 }
 
 // make a face's neighborhood of a given width
@@ -85,10 +77,11 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	while (needRecompute)
 	{
 		needRecompute = false;
-		minNebCrossTime = DBL_MAX;
+		minNebCrossTime = 1000000.0;
 
 		for (int f = 0; f < NUM_FACES; ++f)
 		{
+
 
 			int dim = f / 2;
 			bool isMin = (f % 2) == 0;
@@ -165,10 +158,10 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	{
 		//printf(": minNebCrossTime = %f, stepSize = %f\n", minNebCrossTime, stepSize);
 		//printf(": debugNumCalls = %i\n", debugNumCalls);
-
-//		printk("minNebCrossTime is less than half of step size.");
-		return -1000;
-
+#ifdef DEBUG_FARDIN
+		printf("minNebCrossTime is less than half of step size.");
+#endif
+        return -10000;
 	}
 
 	//printf("\n");
@@ -196,19 +189,13 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 		//printf("error occurred when debugNumCalls = %d\n", debugNumCalls);
 		//printf("rect = ");
 		//println(&debug_initialRect);
-
-//		printk("lifted rect is outside of bloated rect");
-		return -1000;
-
+#ifdef DEBUG_FARDIN
+		printf("lifted rect is outside of bloated rect");
+#endif
+		return -10000;
 	}
 
 	return timeToElapse;
-}
-
-
-int ceil(double num) {
-    int inum = (int)num;
-    return inum;
 }
 
 // generate a split rectangle
@@ -219,9 +206,8 @@ void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 	{
 		int mask = splitDimensions[dimIndex];
 //		int splitNum = iteratorVal % mask;
-
-        int splitNum = iteratorVal - (mask * (int) ((double) iteratorVal/ (double)mask) );
-		iteratorVal = (int) ((double) iteratorVal / (double) mask);
+		int splitNum = iteratorVal - (int) ((double) iteratorVal/ (double) mask) * mask;
+		iteratorVal = (int) (iteratorVal / (double) mask);
 
 		double width = interval_width(&rectToSplit->dims[dimIndex]) / splitDimensions[dimIndex];
 
@@ -233,16 +219,7 @@ void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 
 ///////////////// below is from header file ///////////////
 
-
-
-
-bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings) {
-
-//	bool rv = false;
-//	bool lastIterationSafe = false;
-//	HyperRectangle finalTrackedRect;
-
-	set_error_print_params(settings);
+bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 
 	double stepSize = settings->initialStepSizeCC;
 
@@ -265,9 +242,11 @@ bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings) 
 		// if we're not even close to the desired step size
 		if (hyperrectange_max_width(&trackedRect) > settings->maxRectWidthBeforeError)
 		{
-//			printf("maxRectWidthBeforeError exceeded at time %f, rect = ",
-//				   settings->reachTimeCC - timeRemaining);
-//			println(&trackedRect);
+#ifdef DEBUG_FARDIN
+			printf("maxRectWidthBeforeError exceeded at time %f, rect = ",
+				   settings->reachTimeCC - timeRemaining);
+#endif
+
 			// step size is too large, make it smaller and recompute
 			safe = false;
 		}
@@ -279,10 +258,11 @@ bool face_lifting_iterative_improvement(int startMs, LiftingSettings* settings) 
 		}
 
 		timeRemaining -= timeElapsed;
-//		printf("time timeRemaining %f\n", timeRemaining);
-//		printf("CC: %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].min, trackedRect.dims[1].min, trackedRect.dims[2].min, trackedRect.dims[3].min,trackedRect.dims[4].min, trackedRect.dims[5].min, safe?"true":"false");
-//		printf("  : %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].max, trackedRect.dims[1].max, trackedRect.dims[2].max, trackedRect.dims[3].max,trackedRect.dims[4].max, trackedRect.dims[5].max, safe?"true":"false");
-
+#ifdef DEBUG_FARDIN
+		printf("time timeRemaining %f\n", timeRemaining);
+		printf("CC: %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].min, trackedRect.dims[1].min, trackedRect.dims[2].min, trackedRect.dims[3].min,trackedRect.dims[4].min, trackedRect.dims[5].min, safe?"true":"false");
+		printf("  : %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].max, trackedRect.dims[1].max, trackedRect.dims[2].max, trackedRect.dims[3].max,trackedRect.dims[4].max, trackedRect.dims[5].max, safe?"true":"false");
+#endif
 
 	}
 	if (safe){

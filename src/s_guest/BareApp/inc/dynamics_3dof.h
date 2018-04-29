@@ -1,5 +1,6 @@
-// Fardin Abdi
-// 4-2016
+// Stanley Bak
+// 4-2014
+// Controlled Pendulum header
 
 // if this file is included in geometry.h, the controlled pendulum dynamics will be compiled
 
@@ -8,11 +9,17 @@
 
 #define DYNAMICS_PENDULUM
 
-#include "geometry.h"
+#define NUM_DIMS (6)
 
-int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect);
-double get_derivative_bounds(HyperRectangle *rect, int faceIndex, int controller_type);
-double find_F_max(HyperRectangle* rect);
+#define U_MAX (0.3)
+#define U_MIN (-0.3)
+
+#define COMPLEX_CONTROLLER (0)
+#define SIMPLE_CONTROLLER (1)
+
+
+//#include "face_lift.h"
+#include "geometry.h"
 
 
 #endif
