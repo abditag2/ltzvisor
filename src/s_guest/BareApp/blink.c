@@ -47,6 +47,7 @@
 #include <hw_zynq.h>
 #include <printk.h>
 #include <zynq_uart.h>
+
 #include "inc/blink.h"
 #include "inc/3dof.h"
 #include "types.h"
@@ -85,9 +86,12 @@ void write_to_serial(int float_volts[]) {
     for (i = 0; i < 2; i++) {
 
         Txbuffer[4 * i + 1] = (char) (voltages[i] & 0xff); /* first byte */
-        Txbuffer[4 * i + 2] = (char) (voltages[i] >> 8 & 0xff); /* second byte */
-        Txbuffer[4 * i + 3] = (char) (voltages[i] >> 16 & 0xff); /* third byte */
-        Txbuffer[4 * i + 4] = (char) (voltages[i] >> 24 & 0xff); /* fourth byte */
+        Txbuffer[4 * i + 2] = (char) (voltages[i] >> 8 &
+                                      0xff); /* second byte */
+        Txbuffer[4 * i + 3] = (char) (voltages[i] >> 16 &
+                                      0xff); /* third byte */
+        Txbuffer[4 * i + 4] = (char) (voltages[i] >> 24 &
+                                      0xff); /* fourth byte */
 
     }
 
@@ -173,7 +177,8 @@ void read_from_serial(int *sensor_readings) {
     return;
 }
 
-float P[10] = {-.500f, -2.4000f, 0.00f, 0.1200f, 0.1200f, -2.5000f, -0.0200f, 0.200f, 2.1000f, 10.0000f};
+float P[10] = {-.500f, -2.4000f, 0.00f, 0.1200f, 0.1200f, -2.5000f, -0.0200f,
+               0.200f, 2.1000f, 10.0000f};
 
 float Hx[HX_SIZE][6] = {
         {-0.937749f, -0.347314f, 0, 0.000000f,  0.000000f,  0},
@@ -260,13 +265,14 @@ float hx[HX_SIZE][1] = {
 };
 
 
-struct command controller_safety(struct state sp, struct state x, struct controller_storage* cs){
+struct command controller_safety(struct state sp, struct state x,
+                                 struct controller_storage *cs) {
 
     struct command U;
 
-    cs->int_travel +=  x.travel;
-    cs->int_pitch +=  x.pitch;
-    cs->int_elevation +=  x.elevation;
+    cs->int_travel += x.travel;
+    cs->int_pitch += x.pitch;
+    cs->int_elevation += x.elevation;
 
 //    U.u1 = -6.5 * (x.elevation-sp.elevation) - .701 * x.pitch  - 45.7161 * PERIOD * x.d_elevation -3.051 * PERIOD * x.d_pitch ; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
 //    U.u2 = -6.5 * (x.elevation-sp.elevation) + .5701 * x.pitch - 45.7529 * PERIOD * x.d_elevation +5.970 * PERIOD*  x.d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
@@ -276,9 +282,13 @@ struct command controller_safety(struct state sp, struct state x, struct control
 //    U.u2  =   -6.5 * (x.elevation - sp.elevation)  + .97701 * x.pitch - 55.7529 * PERIOD * x.d_elevation +10.970 * PERIOD*  x.d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
 
 
-    U.u1 =    -6.5f * (x.elevation - sp.elevation)  - .801f * x.pitch - 200.0f * PERIOD * x.d_elevation -20.0f * PERIOD * x.d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
+    U.u1 = -6.5f * (x.elevation - sp.elevation) - .801f * x.pitch -
+           200.0f * PERIOD * x.d_elevation - 20.0f * PERIOD *
+                                             x.d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
     //left voltage
-    U.u2  =   -6.5f * (x.elevation - sp.elevation)  + .6701f * x.pitch - 200.0f * PERIOD * x.d_elevation +24.0f * PERIOD*  x.d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
+    U.u2 = -6.5f * (x.elevation - sp.elevation) + .6701f * x.pitch -
+           200.0f * PERIOD * x.d_elevation + 24.0f * PERIOD *
+                                             x.d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
 
 
     U.u1 += 1.7f;
@@ -299,6 +309,59 @@ struct command controller_safety(struct state sp, struct state x, struct control
     return U;
 }
 
+
+void double2string(double num) {
+
+    if (num < 0){
+        printk("-");
+        num = -num;
+    }
+
+    unsigned int digit = 0;
+
+    digit = (unsigned int) num/10000.0;
+    printk("%d",digit);
+    num = num - digit * 10000.0;
+
+    digit = (unsigned int) num/1000.0;
+    printk("%d",digit);
+    num = num - digit * 1000.0;
+
+    digit = (unsigned int) num/100.0;
+    printk("%d",digit);
+    num = num - digit * 100.0;
+
+    digit = (unsigned int) num/10.0;
+    printk("%d",digit);
+    num = num - digit * 10.0;
+
+    digit = (unsigned int) num;
+    printk("%d",digit);
+    num = num - digit;
+
+    printk(".");
+
+    num = num * 10.0;
+    digit = (unsigned int) num;
+    printk("%d",digit);
+    num = num - digit;
+
+    num = num * 10.0;
+    digit = (unsigned int) num;
+    printk("%d",digit);
+    num = num - digit;
+
+    num = num * 10.0;
+    digit = (unsigned int) num;
+    printk("%d",digit);
+    num = num - digit;
+
+    num = num * 10.0;
+    digit = (unsigned int) num;
+    printk("%d",digit);
+    num = num - digit;
+
+}
 
 /**
  * Blink LED "Task"
@@ -327,24 +390,55 @@ void led_blink(void *parameters) {
 
 //        read_from_serial(sensors);
 //        write_to_serial(float_volts);
-        double reachTimeSC = 20;
 
+        printk("\n");
+        printk("\n");
+
+        printk("test 0 is:");
+        double test0;
+        test0 = 987.2345;
+        double2string(test0);
+        printk("\n");
+
+        printk("test 1 is:");
+        double test1;
+        test1 = 1.2345;
+        double2string(test1);
+        printk("\n");
+
+        printk("test 2 is:");
+        double test;
+        test = -5.6432;
+        double2string(test);
+        printk("\n");
+
+        double reachTimeSC = 20;
         double startState[6] = {-0.15, -0.3, 0, 0, 0, 0};
         //	double startState[6] = {-0.15, 0.3, 0, 0, 0, 0};
-//        printf("from state = [%f, %f, %f, %f]\n", startState[0], startState[1], startState[2], startState[3]);
+        printk("from state = ");
+        double2string(startState[0]);
+        printk("\n");
+        double2string(startState[1]);
+        printk("\n");
+        double2string(startState[2]);
+        printk("\n");
+        double2string(startState[3]);
+        printk("\n");
+
 
         double res = findMaxRestartTime(startState, reachTimeSC);
 
-//        printf("maxRestartTime: %f\n", res);
+//        char cc = uart_getc(1);
+//        printk("cc is %c\n", cc);
+//
 
-        char cc = uart_getc(1);
-        printk("cc is %c\n", cc);
+//        float_volts[0] = sensors[0];
+//        float_volts[1] += 1;
+        printk("\n");
+        printk('sensor reading is');
+        double2string(res);
+        printk("\n");
 
-
-        float_volts[0] = sensors[0];
-        float_volts[1] += 1;
-
-//        printk('sensor reading is %d', sensors[0]);
 
         toggle ^= 0xFF;
         *ptr = toggle;
