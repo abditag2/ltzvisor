@@ -252,8 +252,6 @@ uint32_t ttc_request(uint32_t ttc_num, uint32_t timer_num, uint32_t useconds){
  */
 uint32_t ttc_interrupt_clear(uint32_t interrupt){
 
-	printk("\nhere! int number %d\n", interrupt);
-
 	Zynq_Ttc * ptr_ttc = NULL;
 	uint32_t ttc_num = 0;
 	uint32_t interrupt_reg = 0;

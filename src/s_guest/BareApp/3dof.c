@@ -28,10 +28,14 @@ bool intermediateState(HyperRectangle *r) {
 bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
     double stepSize = 0.1;
 
-    double points[64][6];
+    double points[16][6];
     int number_of_points = fill_in_the_critical_points_3dof(points, r);
 
     double rv;
+
+//    this loop runs in around 5 milliseconds
+//    tick_set(1000000); // ps is 11
+//    printk("before %d\n",time_of_timer_1());
     for (int i = 0; i < number_of_points; i++) {
 
         double time = 0;
@@ -42,10 +46,17 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
             p[k] = points[i][k];
         }
 
+        int count = 0 ;
         while (true) {
-            wait_until_20ms();
-            tick_set(1000000); // ps is 11
-            safe_controller();
+
+//            if ((count) % 10 == 0){
+//                // run the controller every two cycles and skip the first time in the loop
+//                wait_until_20ms();
+//                tick_set(1000000); // ps is 11
+//                safe_controller();
+//            }
+
+            count += 1;
 
             if (shouldStopWithSafety(p, time, &rv))
                 break;
@@ -66,12 +77,12 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
 
             time += stepSize;
         }
-
         if (rv < 0){
             return false;
         }
 
     }
+//    printk("after %d\n",time_of_timer_1());
     return  true;
 
 }
@@ -107,9 +118,9 @@ double potential(double e, double p, double y, double de, double dp, double dy) 
 
 
 bool finalState(HyperRectangle *rect) {
-    double points[64][6];
+    double points[16][6];
 
-    int number_of_points = fill_in_the_critical_points_3dof(points, rect);
+    int number_of_points = (points, rect);
 
     double maxPotential = potential(points[0][0], points[0][1], points[0][2], points[0][3], points[0][4], points[0][5]);
 
@@ -191,23 +202,24 @@ double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC){
     bool safe = false;
     double reachTimeCC = 0;
 
-    // check if it is possible at all to restart the system
-    safe = isSafe(state, reachTimeCC, reachTimeSC, &simTime);
-
-    if (!safe){
-        return -1;
-    }
-
+//    // check if it is possible at all to restart the system
+//    safe = isSafe(state, reachTimeCC, reachTimeSC, &simTime);
+//
+//    if (!safe){
+//        return -1;
+//    }
+//
     //then find the minimum restart time
     double prevSafeReachTimeCC = 0;
-    reachTimeCC = 0.1;
+    reachTimeCC = 0.3;
 
     for (int k= 0 ; k < 3; k++){
         safe = isSafe(state, reachTimeCC, reachTimeSC, &simTime);
 
         if (safe){
             prevSafeReachTimeCC = reachTimeCC;
-            reachTimeCC = 1.5 * reachTimeCC;
+            return prevSafeReachTimeCC;
+//            reachTimeCC = 1.5 * reachTimeCC;
         }
         else
         {
@@ -215,7 +227,7 @@ double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC){
         }
     }
 
-    return prevSafeReachTimeCC;
+    return -1;
 }
 
 bool isSafe(double state[NUM_DIMS], double reachTimeCC, double reachTimeSC, double *simTime) {

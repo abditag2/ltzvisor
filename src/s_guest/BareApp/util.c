@@ -2,7 +2,8 @@
 // Created by fardin on 5/3/18.
 //
 
-#include <stdint.h>
+#include "inc/util.h"
+
 
 void double2string(double num) {
 
@@ -57,13 +58,11 @@ void double2string(double num) {
 
 }
 
-uint32_t safe_call_count = 0;
-
+extern int safe_call_count;
 
 void safe_controller(){
     safe_call_count += 1;
-
-    if (safe_call_count % 20 == 0){
-        printk("called 20 times. %d\n", (uint32_t) safe_call_count/20);
+    if (safe_call_count % 50 == 0){
+        printk("\n\t\t\t\tcalled 50 times. %d\n", (int) safe_call_count/50);
     }
 }

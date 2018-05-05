@@ -25,10 +25,10 @@ int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect) 
 
     for (i0 = 0; i0 < 2; i0++) {
         for (i1 = 0; i1 < 2; i1++) {
-            for (i2 = 0; i2 < 2; i2++) {
+//            for (i2 = 0; i2 < 2; i2++) {
                 for (i3 = 0; i3 < 2; i3++) {
                     for (i4 = 0; i4 < 2; i4++) {
-                        for (i5 = 0; i5 < 2; i5++) {
+//                        for (i5 = 0; i5 < 2; i5++) {
                             if (i0 == 0)
                                 points[number_of_points][0] = rect->dims[0].min;
                             else
@@ -39,10 +39,10 @@ int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect) 
                             else
                                 points[number_of_points][1] = rect->dims[1].max;
 
-                            if (i2 == 0)
+//                            if (i2 == 0)
                                 points[number_of_points][2] = rect->dims[2].min;
-                            else
-                                points[number_of_points][2] = rect->dims[2].max;
+//                            else
+//                                points[number_of_points][2] = rect->dims[2].max;
 
                             if (i3 == 0)
                                 points[number_of_points][3] = rect->dims[3].min;
@@ -55,16 +55,16 @@ int fill_in_the_critical_points_3dof(double (*points)[6], HyperRectangle *rect) 
                                 points[number_of_points][4] = rect->dims[4].max;
 
 
-                            if (i5 == 0)
+//                            if (i5 == 0)
                                 points[number_of_points][5] = rect->dims[5].min;
-                            else
-                                points[number_of_points][5] = rect->dims[5].max;
+//                            else
+//                                points[number_of_points][5] = rect->dims[5].max;
 
                             number_of_points++;
-                        }
+//                        }
                     }
                 }
-            }
+//            }
         }
     }
     return number_of_points;

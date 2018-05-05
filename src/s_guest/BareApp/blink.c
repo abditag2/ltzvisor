@@ -51,7 +51,8 @@
 #include "inc/blink.h"
 #include "inc/3dof.h"
 #include "types.h"
-#include "inc/util.h"
+
+int safe_call_count = 0;
 
 void led_blink(void *pvParameters);
 
@@ -327,10 +328,10 @@ void led_blink(void *parameters) {
     sensors[1] = 0;
     sensors[2] = 0;
 
-    double reachTimeSC = 20;
-    double startState[6] = {-0.15, -0.3, 0, 0, 0, 0};
-    double startState2[6] = {-0.15, -0.0, 0, 0, 0, 0};
-    double startState3[6] = {0, -0.3, 0, 0, 0, 0};
+    double reachTimeSC = 10;
+    double startState[6] = {-0.15, -0.3, 0.0, 0.0, 0.0, 0.0};
+//    double startState2[6] = {-0.15, -0.0, 0, 0, 0, 0};
+//    double startState3[6] = {0, -0.3, 0, 0, 0, 0};
 
     double res;
     int i = 0 ;
@@ -352,51 +353,38 @@ void led_blink(void *parameters) {
 //        printk("%d\n", i);
 
 
-        printk("startin ... \n");
-
-        printk("state: ");
-        double2string(startState[0]);
-        printk("\t");
-        double2string(startState[1]);
-        printk("\t");
-        double2string(startState[2]);
-        printk("\t");
-        double2string(startState[3]);
-        printk("\t");
-
+        printk("startin 1 ... \n");
+//        printk("safe_call_count: %d\n",safe_call_count);
         res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\nres: \t ");
-        double2string(res);
-        printk("\n");
+//        printk("safe_call_count: %d\n",safe_call_count);
 
-        printk("state after: ");
-        double2string(startState2[0]);
-        printk("\t");
-        double2string(startState2[1]);
-        printk("\t");
-        double2string(startState2[2]);
-        printk("\t");
-        double2string(startState2[3]);
-        printk("\t\n");
 
-//        startState[6] = {-0.15, 0.3, 0, 0, 0, 0};
+//        printk("\nres: \t ");
+//        double2string(res);
+//        printk("\n");
+
+
+        printk("startin 2 ... \n");
         startState[0] = 0;
         startState[1] = 0;
+//        printk("safe_call_count: %d\n",safe_call_count);
         res = findMaxRestartTime(startState, reachTimeSC);
-        double2string(res);
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        printk("\nres: \t ");
+//        double2string(res);
+//        printk("\n");
 
-        printk("\nres: \t ");
-        double2string(res);
-        printk("\n");
-
+        printk("startin 3 ... \n");
         startState[0] = 0.1;
         startState[1] = 0.1;
+//        printk("safe_call_count: %d\n",safe_call_count);
         res = findMaxRestartTime(startState, reachTimeSC);
-        double2string(res);
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        double2string(res);
 
-        printk("\nres: \t ");
-        double2string(res);
-        printk("\n");
+//        printk("\nres: \t ");
+//        double2string(res);
+//        printk("\n");
 
         printk("done\n");
 
@@ -411,7 +399,7 @@ int main() {
 
     /** Initialize hardware */
     hw_init();
-//    hw_init_2();
+    hw_init_2();
 
 //    printk(" * Secure bare metal VM: running ... \n\t");
 
@@ -423,7 +411,7 @@ int main() {
 
 
     tick_set(1000000); // ps is 11
-//    tick_set_2(500000);
+    tick_set_2(1000000);
 //    for(int i = 0 ; i < 5; i++){
 //        toggle ^= 0xFF;
 //        *ptr = toggle;

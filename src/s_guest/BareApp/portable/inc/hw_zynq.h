@@ -71,6 +71,7 @@ void hw_init_2( void );
 uint32_t tick_set( uint32_t time );
 uint32_t tick_set_2( uint32_t time );
 
+uint32_t time_of_timer_0();
 void wait_until_20ms();
 
 #endif /* __HW_ZYNQ_H */
