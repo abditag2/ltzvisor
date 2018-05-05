@@ -9,6 +9,7 @@
 
 #include "geometry.h"
 #include "dynamics.h"
+#include "util.h"
 
 typedef struct LiftingSettings
 {

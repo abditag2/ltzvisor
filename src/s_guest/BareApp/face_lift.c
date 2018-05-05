@@ -1,10 +1,13 @@
 // Stanley Bak
 // 4-2014
 
+#ifdef DEBUG_FARDIN
 #include <stdio.h>
+#endif
 
 #include "inc/face_lift.h"
 
+#include "zynq_ttc.h"
 
 double fabs(double x){
 	if (x < 0){
@@ -46,10 +49,9 @@ void make_neighborhood_rect(HyperRectangle* out, int f,
 // returns time elapsed
 
 
-
-
 double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemaining, int controller_type)
 {
+
 	static int debugNumCalls = 0;
 	++debugNumCalls;
 	//HyperRectangle debug_initialRect = *rect;
@@ -73,7 +75,6 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	bool needRecompute = true;
 	double minNebCrossTime;
 	double ders[NUM_FACES];
-
 	while (needRecompute)
 	{
 		needRecompute = false;
@@ -81,7 +82,6 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 
 		for (int f = 0; f < NUM_FACES; ++f)
 		{
-
 
 			int dim = f / 2;
 			bool isMin = (f % 2) == 0;
@@ -158,13 +158,11 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	{
 		//printf(": minNebCrossTime = %f, stepSize = %f\n", minNebCrossTime, stepSize);
 		//printf(": debugNumCalls = %i\n", debugNumCalls);
-#ifdef DEBUG_FARDIN
+		#ifdef DEBUG_FARDIN
 		printf("minNebCrossTime is less than half of step size.");
-#endif
+		#endif
         return -10000;
 	}
-
-	//printf("\n");
 
 	////////////////////////////////////////
 	// lift each face by the minimum time //
@@ -189,9 +187,9 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 		//printf("error occurred when debugNumCalls = %d\n", debugNumCalls);
 		//printf("rect = ");
 		//println(&debug_initialRect);
-#ifdef DEBUG_FARDIN
+		#ifdef DEBUG_FARDIN
 		printf("lifted rect is outside of bloated rect");
-#endif
+		#endif
 		return -10000;
 	}
 
@@ -229,10 +227,13 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 	HyperRectangle trackedRect = settings->init;
 	HyperRectangle hull;
 
-
 	// compute reachability up to split time
 	while (safe && timeRemaining > 0)
 	{
+		wait_until_20ms();
+        tick_set(1000000); // ps is 11
+        safe_controller();
+
 		if (settings->reachedAtIntermediateTime)
 			hull = trackedRect;
 
@@ -242,10 +243,10 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 		// if we're not even close to the desired step size
 		if (hyperrectange_max_width(&trackedRect) > settings->maxRectWidthBeforeError)
 		{
-#ifdef DEBUG_FARDIN
+			#ifdef DEBUG_FARDIN
 			printf("maxRectWidthBeforeError exceeded at time %f, rect = ",
 				   settings->reachTimeCC - timeRemaining);
-#endif
+			#endif
 
 			// step size is too large, make it smaller and recompute
 			safe = false;
@@ -258,15 +259,14 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 		}
 
 		timeRemaining -= timeElapsed;
-#ifdef DEBUG_FARDIN
+		#ifdef DEBUG_FARDIN
 		printf("time timeRemaining %f\n", timeRemaining);
 		printf("CC: %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].min, trackedRect.dims[1].min, trackedRect.dims[2].min, trackedRect.dims[3].min,trackedRect.dims[4].min, trackedRect.dims[5].min, safe?"true":"false");
 		printf("  : %f \t %f \t %f \t %f \t %f \t %f Safe: %s \n", trackedRect.dims[0].max, trackedRect.dims[1].max, trackedRect.dims[2].max, trackedRect.dims[3].max,trackedRect.dims[4].max, trackedRect.dims[5].max, safe?"true":"false");
-#endif
-
+		#endif
 	}
-	if (safe){
-		settings->reachedAtFinalTime(&trackedRect);
+	if (safe)
+    {
 		return settings->checkStabilizabilityAfterCCperiod(&trackedRect, settings->reachTimeSC);
 	}
 	else

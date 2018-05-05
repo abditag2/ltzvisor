@@ -3,5 +3,9 @@ project(pc)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(pc
-        pc.c)
+add_executable(pc pc.c)
+
+
+TARGET_LINK_LIBRARIES( pc
+        pthread
+        )

@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/fardin/devel/pc/pc.c" "/home/fardin/devel/pc/cmake-build-debug/CMakeFiles/pc.dir/pc.c.o"
+  "/home/fardin/devel/ltzvisor/pc/pc.c" "/home/fardin/devel/ltzvisor/pc/cmake-build-debug/CMakeFiles/pc.dir/pc.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

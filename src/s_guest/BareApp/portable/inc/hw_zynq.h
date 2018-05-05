@@ -59,6 +59,7 @@
  * @retval
  */
 void hw_init( void );
+void hw_init_2( void );
 
 /**
  * Set secure world tick
@@ -68,5 +69,8 @@ void hw_init( void );
  * @retval
  */
 uint32_t tick_set( uint32_t time );
+uint32_t tick_set_2( uint32_t time );
+
+void wait_until_20ms();
 
 #endif /* __HW_ZYNQ_H */

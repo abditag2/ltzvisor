@@ -1,1 +1,1 @@
-/usr/bin/cc -g   CMakeFiles/pc.dir/pc.c.o  -o pc 
+/usr/bin/cc -g   CMakeFiles/pc.dir/pc.c.o  -o pc -lpthread 

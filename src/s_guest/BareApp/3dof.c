@@ -21,8 +21,6 @@ bool intermediateState(HyperRectangle *r) {
     if (-r->dims[0].max + 0.33*r->dims[1].min > 0.3 || -r->dims[0].max - 0.33*r->dims[1].min > 0.3 )
         return false;
 
-
-
     return true;
 
 }
@@ -45,6 +43,10 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
         }
 
         while (true) {
+            wait_until_20ms();
+            tick_set(1000000); // ps is 11
+            safe_controller();
+
             if (shouldStopWithSafety(p, time, &rv))
                 break;
 
@@ -79,7 +81,6 @@ double potential(double e, double p, double y, double de, double dp, double dy) 
 
     double P_lmi[6][6] =
             {
-
                     {25.4636357727033, -0.11459836805098, 0, 4.28913430335527, -0.0202143458739051, 0},
                     {-0.11459836805098, 2.93322110122599, 0 - 0.110071227498266, 0.26291287971907, 0},
                     {0, 0, 0, 0, 0, 0},
@@ -150,7 +151,6 @@ bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p) {
     return rv;
 }
 
-
 bool runReachability(double *start, double reachTimeCC, double reachTimeSC) {
     LiftingSettings set;
 
@@ -183,6 +183,9 @@ bool runReachability(double *start, double reachTimeCC, double reachTimeSC) {
 
 double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC){
 
+    tick_set(1000000); // ps is 11
+    safe_controller();
+
     double simTime;
 
     bool safe = false;
@@ -197,14 +200,14 @@ double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC){
 
     //then find the minimum restart time
     double prevSafeReachTimeCC = 0;
-    reachTimeCC = 1;
+    reachTimeCC = 0.1;
 
-    for (int k= 0 ; k < 20; k++){
+    for (int k= 0 ; k < 3; k++){
         safe = isSafe(state, reachTimeCC, reachTimeSC, &simTime);
 
         if (safe){
             prevSafeReachTimeCC = reachTimeCC;
-            reachTimeCC = 2 * reachTimeCC;
+            reachTimeCC = 1.5 * reachTimeCC;
         }
         else
         {

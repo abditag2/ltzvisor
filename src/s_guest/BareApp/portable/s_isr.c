@@ -46,6 +46,7 @@
 
 #include <gic.h>
 #include <s_isr.h>
+#include "printk.h"
 
 uint32_t interrupt;
 

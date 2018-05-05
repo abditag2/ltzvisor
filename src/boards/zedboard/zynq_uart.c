@@ -186,17 +186,10 @@ uint32_t uart_getc(uint8_t uart_id){
 	uint32_t data = 0;
 
 	/* Wait until RxFIFO is filled up to the trigger level */
-	while(! ptr_uart->ch_status & UART_CH_STATUS_RTRIG);
+	while(!(char)(ptr_uart->ch_status & UART_CH_STATUS_RTRIG));
 
-//    printk("UART_CH_STATUS_RTRIG is %d\n",UART_CH_STATUS_RTRIG);
-//    printk("cc is = %d\n", ptr_uart->ch_status);
-//
-//    printk("cond is %d\n", ptr_uart->ch_status & UART_CH_STATUS_RTRIG);
-//    ptr_uart->ch_status = 0;
 
     data = ptr_uart->tx_rx_fifo;
-//    printk("data is %d\n", data);
-
     return data;
 }
 

@@ -54,10 +54,10 @@ RM = /home/fardin/Downloads/clion-2017.3/bin/cmake/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/fardin/devel/pc
+CMAKE_SOURCE_DIR = /home/fardin/devel/ltzvisor/pc
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fardin/devel/pc/cmake-build-debug
+CMAKE_BINARY_DIR = /home/fardin/devel/ltzvisor/pc/cmake-build-debug
 
 #=============================================================================
 # Target rules for target CMakeFiles/pc.dir
@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/fardin/devel/pc/cmake-build-debug
 CMakeFiles/pc.dir/all:
 	$(MAKE) -f CMakeFiles/pc.dir/build.make CMakeFiles/pc.dir/depend
 	$(MAKE) -f CMakeFiles/pc.dir/build.make CMakeFiles/pc.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fardin/devel/pc/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target pc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/fardin/devel/ltzvisor/pc/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target pc"
 .PHONY : CMakeFiles/pc.dir/all
 
 # Include target in all.
@@ -76,9 +76,9 @@ all: CMakeFiles/pc.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/pc.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fardin/devel/pc/cmake-build-debug/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/fardin/devel/ltzvisor/pc/cmake-build-debug/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/pc.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/fardin/devel/pc/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/fardin/devel/ltzvisor/pc/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/pc.dir/rule
 
 # Convenience name for target.

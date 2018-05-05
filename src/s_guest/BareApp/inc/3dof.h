@@ -7,6 +7,7 @@
 #include "geometry.h"
 #include "dynamics_3dof.h"
 #include "face_lift.h"
+#include "util.h"
 
 // return the potential of the lmi-outputted function for a given state
 double potential(double e, double p, double y, double de, double dp, double dy);

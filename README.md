@@ -199,7 +199,7 @@ board is configured to boot from the SD card.
 		`mmcinfo`
 		
 		`fatload mmc 0 0x1C000000 LTZVisor.bin`
-		
+
 		`go 0x1C000000` 
 
 

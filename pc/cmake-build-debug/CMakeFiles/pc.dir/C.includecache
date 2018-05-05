@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/fardin/devel/pc/pc.c
+/home/fardin/devel/ltzvisor/pc/pc.c
 errno.h
 -
 fcntl.h
@@ -18,5 +18,7 @@ termios.h
 unistd.h
 -
 stdio.h
+-
+pthread.h
 -
 

@@ -54,6 +54,11 @@
 	asm volatile("smc #0");\
 }
 
+#define YIELD_NOCALL(){ \
+	asm volatile("ldr r0, =0x0ffffff1");\
+}
+
+
 /** Type definition of the interrupt handler */
 typedef void (handler)(void * t);
 

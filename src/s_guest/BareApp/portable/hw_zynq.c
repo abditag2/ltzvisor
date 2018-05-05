@@ -63,9 +63,47 @@ void hw_init( void ){
 	/** Config TTC1_2 ISR*/
 	interrupt_enable(TTC1_TTCx_2_INTERRUPT,TRUE);
 	interrupt_target_set(TTC1_TTCx_2_INTERRUPT,0,1);
-	interrupt_priority_set(TTC1_TTCx_2_INTERRUPT,6);
+	interrupt_priority_set(TTC1_TTCx_2_INTERRUPT,4);
 
 }
+
+void hw_init_2( void ){
+
+    /** Initialize TTC1_2 as S Tick */
+    ttc_init(TTC0,TTCx_2,INTERVAL);
+
+    /** Config TTC1_2 ISR*/
+    interrupt_enable(TTC0_TTCx_2_INTERRUPT,TRUE);
+    interrupt_target_set(TTC0_TTCx_2_INTERRUPT,0,1);
+    interrupt_priority_set(TTC0_TTCx_2_INTERRUPT,2);
+
+}
+
+uint32_t tick_set_2( uint32_t time ){
+
+	uint32_t ret = 1;
+
+	/** Set tick rate */
+	ret = ttc_request(TTC0, TTCx_2, time);
+
+	/** Start counting */
+	ttc_enable(TTC0, TTCx_2);
+
+	return ret;
+}
+
+
+uint32_t time_of_timer_2(){
+    return read_ttc(TTC1, TTCx_2);
+}
+
+void wait_until_20ms(){
+    uint32_t now = 0;
+    while(now < 542){
+        now = time_of_timer_2();
+    }
+}
+
 
 /**
  * Set secure world tick
