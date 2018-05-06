@@ -177,7 +177,7 @@ double get_derivative_bounds(HyperRectangle *rect, int faceIndex, int controller
 
     double rv = 0;
 
-    double points[256][6];
+    double points[16][6];
     int number_of_points = fill_in_the_critical_points_3dof(points, rect);
 
     double commands[4][2];

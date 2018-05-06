@@ -219,24 +219,30 @@ void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 
 bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 
+
 	double stepSize = settings->initialStepSizeCC;
 	bool safe = true; // until proven otherwise
 
 	double timeRemaining = settings->reachTimeCC;
 	HyperRectangle trackedRect = settings->init;
 	HyperRectangle hull;
-
-    int count = 0 ;
+//    printk("here 3 time_of_timer_1() is %d\n", time_of_timer_1());
 	// compute reachability up to split time
 	while (safe && timeRemaining > 0)
 	{
-        if ((count+1) % 2 == 0){
+
+        if (time_of_timer_1() > 542){
+            printk("time_of_timer_1() is %d\n", time_of_timer_1());
+            while(1);
+        }
+
+        if ( 542 - time_of_timer_1() < 542 ){
             // run the controller every two cycles and intentionally wait in the first loop
+//            printk("he 4 %d\n", time_of_timer_1());
             wait_until_20ms();
             tick_set(1000000); // ps is 11
             safe_controller();
         }
-        count += 1;
 
 		if (settings->reachedAtIntermediateTime)
 			hull = trackedRect;
@@ -276,6 +282,18 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 
 	if (safe)
     {
+        if (time_of_timer_1() > 542){
+            printk("at return %d\n", time_of_timer_1());
+            while(1);
+        }
+
+        if ( 542 - time_of_timer_1() < 542 ){
+            // run the controller every two cycles and intentionally wait in the first loop
+//            printk("return 4 %d\n", time_of_timer_1());
+            wait_until_20ms();
+            tick_set(1000000); // ps is 11
+            safe_controller();
+        }
 		return settings->checkStabilizabilityAfterCCperiod(&trackedRect, settings->reachTimeSC);
 	}
 	else

@@ -38,6 +38,18 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
 //    printk("before %d\n",time_of_timer_1());
     for (int i = 0; i < number_of_points; i++) {
 
+        if (time_of_timer_1() > 542){
+            printk("in sim is %d\n", time_of_timer_1());
+            while(1);
+        }
+
+        if ( 542 - time_of_timer_1() < 20 ){
+//            printk("at sim %d\n", time_of_timer_1());
+            wait_until_20ms();
+            tick_set(1000000); // ps is 11
+            safe_controller();
+        }
+
         double time = 0;
 
         double p[6];
@@ -58,19 +70,23 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
 
             count += 1;
 
-            if (shouldStopWithSafety(p, time, &rv))
+            if (shouldStopWithSafety(p, time, &rv, reachTimeSC))
                 break;
 
             HyperRectangle rect;
 
-            for (int d = 0; d < NUM_DIMS; ++d)
-                rect.dims[d].min = rect.dims[d].max = p[d];
+//            for (int d = 0; d < NUM_DIMS; ++d)
+//                rect.dims[d].min = rect.dims[d].max = p[d];
 
             // euler's method
 
             for (int d = 0; d < NUM_DIMS; ++d) {
 
-                double der = get_derivative_bounds(&rect, 2 * d, SIMPLE_CONTROLLER);
+//                double der = get_derivative_bounds(&rect, 2 * d, SIMPLE_CONTROLLER);
+                double commands[1][2];
+                int num_commands = control_commands(commands, p, SIMPLE_CONTROLLER);
+                double der = eval_dim_with_controller_with_commad(d, p, commands[0]);
+
 
                 p[d] += stepSize * der;
             }
@@ -78,6 +94,7 @@ bool checkStabilityWithSC(HyperRectangle *r, double reachTimeSC){
             time += stepSize;
         }
         if (rv < 0){
+//            printk("after %d\n",time_of_timer_1());
             return false;
         }
 
@@ -134,11 +151,11 @@ bool finalState(HyperRectangle *rect) {
     return maxPotential < 1;
 }
 
-bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p) {
+bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p,
+                          double maxTime) {
 
     bool rv = false;
     double pot = potential(state[0], state[1], state[2], state[3], state[4], state[5]);
-    double maxTime = 10.0;
 
     if (pot < 1) {
         rv = true;
@@ -185,7 +202,6 @@ bool runReachability(double *start, double reachTimeCC, double reachTimeSC) {
     set.checkStabilizabilityAfterCCperiod = checkStabilityWithSC;
 
     bool safe = true;
-
     safe = face_lifting_iterative_improvement(&set);
 
     return safe;

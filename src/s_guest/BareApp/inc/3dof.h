@@ -16,6 +16,6 @@ double potential(double e, double p, double y, double de, double dp, double dy);
 bool isSafe(double state[NUM_DIMS], double reachTimeCC, double reachTimeSC, double* simTime);
 double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC);
 bool shouldStop(double state[NUM_DIMS], double simTime, void* p);
-bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p);
+bool shouldStopWithSafety(double state[NUM_DIMS], double simTime, void *p, double maxTime);
 
 #endif

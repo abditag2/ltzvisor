@@ -328,13 +328,12 @@ void led_blink(void *parameters) {
     sensors[1] = 0;
     sensors[2] = 0;
 
-    double reachTimeSC = 10;
+    double reachTimeSC = 4.0;
     double startState[6] = {-0.15, -0.3, 0.0, 0.0, 0.0, 0.0};
 //    double startState2[6] = {-0.15, -0.0, 0, 0, 0, 0};
 //    double startState3[6] = {0, -0.3, 0, 0, 0, 0};
 
     double res;
-    int i = 0 ;
     for (;;) {
 
 //        read_from_serial(sensors);
@@ -352,33 +351,53 @@ void led_blink(void *parameters) {
 //        i+=1;
 //        printk("%d\n", i);
 
+//        startState[0] = -0.15;
+//        startState[1] = -0.3;
+//        startState[3] = 0.0;
+//        startState[4] = 0.0;
 
         printk("startin 1 ... \n");
-//        printk("safe_call_count: %d\n",safe_call_count);
+
+        printk("safe_call_count: %d\n",safe_call_count);
+        double2string(startState[0]);
+        double2string(startState[1]);
         res = findMaxRestartTime(startState, reachTimeSC);
-//        printk("safe_call_count: %d\n",safe_call_count);
+        printk("\t");double2string(res);printk("\t");
 
-
-//        printk("\nres: \t ");
-//        double2string(res);
-//        printk("\n");
-
-
-        printk("startin 2 ... \n");
-        startState[0] = 0;
-        startState[1] = 0;
-//        printk("safe_call_count: %d\n",safe_call_count);
+        startState[0] = -0.15;
+        startState[1] = 0.0;
+        double2string(startState[0]);
+        double2string(startState[1]);
+        printk("safe_call_count: %d\n",safe_call_count);
         res = findMaxRestartTime(startState, reachTimeSC);
-//        printk("safe_call_count: %d\n",safe_call_count);
-//        printk("\nres: \t ");
-//        double2string(res);
-//        printk("\n");
+        printk("\t");double2string(res);printk("\t");
 
-        printk("startin 3 ... \n");
         startState[0] = 0.1;
-        startState[1] = 0.1;
-//        printk("safe_call_count: %d\n",safe_call_count);
+        startState[1] = 0.3;
+        printk("safe_call_count: %d\n",safe_call_count);
         res = findMaxRestartTime(startState, reachTimeSC);
+        printk("\t");double2string(res);printk("\t");
+
+        startState[0] = 0;
+        startState[1] = -0.3;
+        printk("safe_call_count: %d\n",safe_call_count);
+        res = findMaxRestartTime(startState, reachTimeSC);
+        printk("\t");double2string(res);printk("\t");
+
+        startState[0] = 0.3;
+        startState[2] = 0.1;
+        printk("safe_call_count: %d\n",safe_call_count);
+        res = findMaxRestartTime(startState, reachTimeSC);
+        printk("\t");double2string(res);printk("\t");
+
+        startState[0] = 0.0;
+        startState[3] = 0.0;
+        printk("safe_call_count: %d\n",safe_call_count);
+        res = findMaxRestartTime(startState, reachTimeSC);
+        printk("\t");double2string(res);printk("\t");
+        printk("safe_call_count: %d\n",safe_call_count);
+
+
 //        printk("safe_call_count: %d\n",safe_call_count);
 //        double2string(res);
 
