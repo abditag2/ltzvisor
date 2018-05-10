@@ -66,42 +66,42 @@ float add_right = 0;
 float C[HX_SIZE][1];
 struct state sps;
 
-//
-//// Loop <delay> times in a way that the compiler won't optimize away
-//static inline void wait() {
-//    int32_t count = 1000;
-//    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
-//    : "=r"(count): [count]"0"(count) : "cc");
-//}
-//
-//void write_to_serial(int float_volts[]) {
-//
-//    int voltages[2];
-//    unsigned char Txbuffer[9];
-//    char i = 0;
-//
-//    Txbuffer[0] = 0xCC; // End Byte
-//
-//    voltages[0] = float_volts[0];
-//    voltages[1] = float_volts[1];
-//
-//    for (i = 0; i < 2; i++) {
-//
-//        Txbuffer[4 * i + 1] = (char) (voltages[i] & 0xff); /* first byte */
-//        Txbuffer[4 * i + 2] = (char) (voltages[i] >> 8 &
-//                                      0xff); /* second byte */
-//        Txbuffer[4 * i + 3] = (char) (voltages[i] >> 16 &
-//                                      0xff); /* third byte */
-//        Txbuffer[4 * i + 4] = (char) (voltages[i] >> 24 &
-//                                      0xff); /* fourth byte */
-//
-//    }
-//
-//    for (i = 0; i < 9; i++) {
-//        uart_putc(1, Txbuffer[i]);
-//        wait();
-//    }
-//}
+
+// Loop <delay> times in a way that the compiler won't optimize away
+static inline void wait() {
+    int32_t count = 1000;
+    asm volatile("__delay_%=: subs %[count], %[count], #1; bne __delay_%=\n"
+    : "=r"(count): [count]"0"(count) : "cc");
+}
+
+void write_to_serial(int float_volts[]) {
+
+    int voltages[2];
+    unsigned char Txbuffer[9];
+    char i = 0;
+
+    Txbuffer[0] = 0xCC; // End Byte
+
+    voltages[0] = float_volts[0];
+    voltages[1] = float_volts[1];
+
+    for (i = 0; i < 2; i++) {
+
+        Txbuffer[4 * i + 1] = (char) (voltages[i] & 0xff); /* first byte */
+        Txbuffer[4 * i + 2] = (char) (voltages[i] >> 8 &
+                                      0xff); /* second byte */
+        Txbuffer[4 * i + 3] = (char) (voltages[i] >> 16 &
+                                      0xff); /* third byte */
+        Txbuffer[4 * i + 4] = (char) (voltages[i] >> 24 &
+                                      0xff); /* fourth byte */
+
+    }
+
+    for (i = 0; i < 9; i++) {
+        uart_putc(1, Txbuffer[i]);
+        wait();
+    }
+}
 //
 //
 //void matrix_mult(double A[HX_SIZE][6], double B[6][1], int m, int n, int k) {
@@ -133,30 +133,30 @@ struct state sps;
 //}
 //
 //
-//void read_from_serial(int *sensor_readings) {
-//
-//    char rxChar1[12];
-//    char rxChar = 0xAA;
-//
-//
-//    uart_putc(1, rxChar);
-//    wait();
-//
-//    for (int i = 0; i < 12; i++) {
-//        rxChar1[i] = uart_getc(1);
-//        wait();
-//    }
-//
-//
-//    sensor_readings[0] = *(unsigned int *) &rxChar1[0];
-//    sensor_readings[1] = *(unsigned int *) &rxChar1[4];
-//    sensor_readings[2] = *(unsigned int *) &rxChar1[8];
-////    printk("sensor1: %d\n", sensor_readings[0]);
-////    printk("sensor2: %d\n", sensor_readings[1]);
-////    printk("sensor3: %d\n", sensor_readings[2]);
-//
-//    return;
-//}
+void read_from_serial(int *sensor_readings) {
+
+    char rxChar1[12];
+    char rxChar = 0xAA;
+
+
+    uart_putc(1, rxChar);
+    wait();
+
+    for (int i = 0; i < 12; i++) {
+        rxChar1[i] = uart_getc(1);
+        wait();
+    }
+
+
+    sensor_readings[0] = *(unsigned int *) &rxChar1[0];
+    sensor_readings[1] = *(unsigned int *) &rxChar1[4];
+    sensor_readings[2] = *(unsigned int *) &rxChar1[8];
+//    printk("sensor1: %d\n", sensor_readings[0]);
+//    printk("sensor2: %d\n", sensor_readings[1]);
+//    printk("sensor3: %d\n", sensor_readings[2]);
+
+    return;
+}
 //
 //float P[10] = {-.500f, -2.4000f, 0.00f, 0.1200f, 0.1200f, -2.5000f, -0.0200f,
 //               0.200f, 2.1000f, 10.0000f};
@@ -314,6 +314,11 @@ void led_blink(void *parameters) {
 //
 //    }
 
+    for(int kk = 0; kk < 10; kk++)
+    {
+        YIELD()
+    }
+
     static uint32_t toggle;
     /** 4GPIO (LED) in FPGA fabric */
     static uint32_t *ptr = (uint32_t *) 0x41200000;
@@ -336,10 +341,10 @@ void led_blink(void *parameters) {
     double res;
     for (;;) {
 
-//        read_from_serial(sensors);
-//        float_volts[0] = sensors[0];
-//        float_volts[1] += 1;
-//        write_to_serial(float_volts);
+        read_from_serial(sensors);
+        float_volts[0] = sensors[0] + 1;
+        float_volts[1] = sensors[2] + 1;
+        write_to_serial(float_volts);
 
 
 //        printk("start count\n");
@@ -356,46 +361,46 @@ void led_blink(void *parameters) {
 //        startState[3] = 0.0;
 //        startState[4] = 0.0;
 
-        printk("startin 1 ... \n");
-
-        printk("safe_call_count: %d\n",safe_call_count);
-        double2string(startState[0]);
-        double2string(startState[1]);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-
-        startState[0] = -0.15;
-        startState[1] = 0.0;
-        double2string(startState[0]);
-        double2string(startState[1]);
-        printk("safe_call_count: %d\n",safe_call_count);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-
-        startState[0] = 0.1;
-        startState[1] = 0.3;
-        printk("safe_call_count: %d\n",safe_call_count);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-
-        startState[0] = 0;
-        startState[1] = -0.3;
-        printk("safe_call_count: %d\n",safe_call_count);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-
-        startState[0] = 0.3;
-        startState[2] = 0.1;
-        printk("safe_call_count: %d\n",safe_call_count);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-
-        startState[0] = 0.0;
-        startState[3] = 0.0;
-        printk("safe_call_count: %d\n",safe_call_count);
-        res = findMaxRestartTime(startState, reachTimeSC);
-        printk("\t");double2string(res);printk("\t");
-        printk("safe_call_count: %d\n",safe_call_count);
+//        printk("startin 1 ... \n");
+//
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        double2string(startState[0]);
+//        double2string(startState[1]);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//
+//        startState[0] = -0.15;
+//        startState[1] = 0.0;
+//        double2string(startState[0]);
+//        double2string(startState[1]);
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//
+//        startState[0] = 0.1;
+//        startState[1] = 0.3;
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//
+//        startState[0] = 0;
+//        startState[1] = -0.3;
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//
+//        startState[0] = 0.3;
+//        startState[2] = 0.1;
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//
+//        startState[0] = 0.0;
+//        startState[3] = 0.0;
+//        printk("safe_call_count: %d\n",safe_call_count);
+//        res = findMaxRestartTime(startState, reachTimeSC);
+//        printk("\t");double2string(res);printk("\t");
+//        printk("safe_call_count: %d\n",safe_call_count);
 
 
 //        printk("safe_call_count: %d\n",safe_call_count);
@@ -405,11 +410,9 @@ void led_blink(void *parameters) {
 //        double2string(res);
 //        printk("\n");
 
-        printk("done\n");
-
-//        toggle ^= 0xFF;
-//        *ptr = toggle;
-//        YIELD()
+        toggle ^= 0xFF;
+        *ptr = toggle;
+        YIELD()
     }
 }
 
@@ -418,7 +421,6 @@ int main() {
 
     /** Initialize hardware */
     hw_init();
-    hw_init_2();
 
 //    printk(" * Secure bare metal VM: running ... \n\t");
 
@@ -430,7 +432,6 @@ int main() {
 
 
     tick_set(1000000); // ps is 11
-    tick_set_2(1000000);
 //    for(int i = 0 ; i < 5; i++){
 //        toggle ^= 0xFF;
 //        *ptr = toggle;

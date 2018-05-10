@@ -19,6 +19,8 @@ unistd.h
 -
 stdio.h
 -
-pthread.h
+sys/time.h
+-
+linux/ioctl.h
 -
 
