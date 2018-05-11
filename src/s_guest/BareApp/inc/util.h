@@ -9,5 +9,7 @@
 
 void double2string(double num);
 void safe_controller();
+void write_to_serial(int float_volts[]);
+void read_from_serial(int *sensor_readings);
 
 #endif //LTZVISOR_UTIL_H

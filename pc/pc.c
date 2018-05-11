@@ -8,6 +8,58 @@
 #include <linux/ioctl.h>
 
 
+double eval_dim_with_controller_with_commad(int dim, double state[], double command[]) {
+
+//    double p1 = -1.0000;
+//    double p2 = -2.4000;
+//    double p3 = -0.0943;
+//    double p4 = 0.1200;
+//    double p5 = 0.1200;
+//    double p6 = -2.5000;
+//    double p7 = -0.0200;
+    double p8 = 0.200;
+    double p9 = 2.1000;
+//    double p10 = 10.0000;
+
+//    double e = state[0];
+//    double p = state[1];
+//    double y = state[2];
+    double de = state[3];
+    double dp = state[4];
+    double dy = state[5];
+
+    double rv = 0;
+
+    if (dim == 0) {
+        rv = de;
+    } else if (dim == 1) {
+        rv = dp;
+    } else if (dim == 2) {
+        rv = dy;
+    } else if (dim == 3) {
+        rv = p8 * command[0] + p8 * command[1];
+    } else if (dim == 4) {
+        rv = p9 * command[0] - p9 * command[1];
+    } else if (dim == 5) {
+        rv = 0;
+    }
+
+    return rv;
+}
+
+
+
+void simulate(double state[], double command[], double time){
+    double d_state[6];
+    for (int i = 0 ;i < 6; i ++){
+        d_state[i] = eval_dim_with_controller_with_commad(i, state, command);
+    }
+
+    for (int i=0; i<6;i++){
+        state[i] = state[i] + d_state[i]*time;
+    }
+}
+
 
 int
 set_interface_attribs(int fd, int speed, int parity) {
@@ -47,22 +99,6 @@ set_interface_attribs(int fd, int speed, int parity) {
     return 0;
 }
 
-
-//void
-//set_blocking(int fd, int should_block) {
-//    struct termios tty;
-//    memset(&tty, 0, sizeof tty);
-//    if (tcgetattr(fd, &tty) != 0) {
-//        printf("error %d from tggetattr", errno);
-//        return;
-//    }
-//
-//    tty.c_cc[VMIN] = should_block ? 1 : 0;
-//    tty.c_cc[VTIME] = 5;            // 0.5 seconds read timeout
-//
-//    if (tcsetattr(fd, TCSANOW, &tty) != 0)
-//        printf("error %d setting term attributes", errno);
-//}
 
 void set_blocking(int fd, int should_block, int number_of_char) {
     struct termios tty;
@@ -108,9 +144,9 @@ unsigned char receive_bytes(int fd, int *commands) {
 
 
 void send_serial(int fd, int sensor_readings[]) {
-    unsigned char Txbuffer[12];
+    unsigned char Txbuffer[24];
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 6; i++) {
         Txbuffer[4 * i] = (unsigned char) (sensor_readings[i] &
                                            0xff); /* first byte */
         Txbuffer[4 * i + 1] = (unsigned char) (sensor_readings[i] >> 8 &
@@ -121,42 +157,19 @@ void send_serial(int fd, int sensor_readings[]) {
                                                0xff); /* fourth byte */
     }
 
-    write(fd, Txbuffer, 12);
+    write(fd, Txbuffer, 24);
     usleep(1000);             // sleep enough to transmit the 7 plus
 //    printf("SEND: data is written.\n");
 
 }
 
 
-int commands[2];
-int sensor_readings_calibrated[3];
-int vol_left, vol_right;
-
-
-void *sender(int fd) {
-    while (1) {
-        while (1) {
-            char cc;
-
-            set_blocking(fd, 1, 1);
-            int n = read(fd, &cc, 1);
-
-            if (cc == 0xCC) {
-                receive_bytes(fd, commands);
-            } else if (cc == 0xAA) {
-                send_serial(fd, sensor_readings_calibrated);
-            }
-        }
-
-    }
-}
-
-
 void main() {
-    sensor_readings_calibrated[0] = 1;
-    sensor_readings_calibrated[1] = 2;
-    sensor_readings_calibrated[2] = 3;
 
+    int commands[2];
+    int sensor_reading[6];
+    double system_state[6];
+    double actuator_volts[2];
 
     char *portname = "/dev/ttyACM0";
     printf("starting ... \n");
@@ -209,24 +222,42 @@ void main() {
 
     printf("\n\nstarting to get commands\n\n");
 
+    int first_time = 1;
     while (1) {
 
         set_blocking(fd, 1, 1);
         int n = (int) read(fd, &cc, 1);
-//        printf("READ: %hhx\n", cc);
-        int com1 = rand();
-        int com2 = rand();
 
-        sensor_readings_calibrated[0] = com1;
-        sensor_readings_calibrated[1] = com2;
-        sensor_readings_calibrated[2] = com2;
-
+        struct timeval last_time, now;
         if (cc == 0xcc) {
+            gettimeofday(&last_time, NULL);
+            first_time = 0;
+
             receive_bytes(fd, commands);
-            printf("recieved: \t %d, %d", commands[0], commands[1]);
+            actuator_volts[0] = commands[0]/10000.0;
+            actuator_volts[1] = commands[1]/10000.0;
+
+//            printf("recieved: \t %lf, %lf\n", actuator_volts[0], actuator_volts[1]);
         } else if (cc == 0xaa) {
-            printf("sending: \t %d, %d, %d\n", sensor_readings_calibrated[0], sensor_readings_calibrated[1], sensor_readings_calibrated[2]);
-            send_serial(fd, sensor_readings_calibrated);
+            gettimeofday(&now, NULL);
+            double time_diff;
+            if (first_time){
+                time_diff = 0;
+            }else{
+                time_diff = (now.tv_sec - last_time.tv_sec) +
+                                   (double)(now.tv_usec - last_time.tv_usec)/1000000;
+            }
+
+            printf("time diff is: %lf\n", time_diff);
+
+            simulate(system_state, actuator_volts, time_diff);
+
+            for (int i = 0 ; i < 6 ; i ++){
+                sensor_reading[i] = (int) (system_state[i] * 10000.0);
+            }
+
+//            printf("sending: \t %d, %d, %d\n", system_state[0], system_state[1], system_state[2]);
+            send_serial(fd, sensor_reading);
         }
     }
 

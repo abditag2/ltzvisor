@@ -103,7 +103,7 @@ uint32_t time_of_timer_1(){
 
 void wait_until_20ms(){
     uint32_t now = 0;
-    while(now < 542){
+    while(now < 630){
         now = time_of_timer_1();
     }
 }
