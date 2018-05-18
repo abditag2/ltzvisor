@@ -87,8 +87,7 @@ void led_blink(void *parameters) {
 //
 //    }
 
-    for(int kk = 0; kk < 10; kk++)
-    {
+    for (int kk = 0; kk < 10; kk++) {
         YIELD()
     }
 
@@ -97,20 +96,30 @@ void led_blink(void *parameters) {
     static uint32_t *ptr = (uint32_t *) 0x41200000;
 
     int sensors[6];
+    double sensors_double[6];
 
     double reachTimeSC = 4.0;
-    double startState[6] = {-0.15, -0.3, 0.0, 0.0, 0.0, 0.0};
+//    double startState[6] = {-0.15, -0.3, 0.0, 0.0, 0.0, 0.0};
 
     double res;
     for (;;) {
 
         read_from_serial(sensors);
-        res = findMaxRestartTime(startState, reachTimeSC);
+        for (int i = 0 ; i < 6; i ++){
+            sensors_double[i] = sensors[i]/10000.0;
+        }
+
+        res = findMaxRestartTime(sensors_double, reachTimeSC);
 
         toggle ^= 0xFF;
         *ptr = toggle;
         tick_set((int) (res * 1000000));
-        YIELD()
+
+        double2string(res);
+        printk("\n");
+        if (res > 0){
+            YIELD()
+        }
     }
 }
 

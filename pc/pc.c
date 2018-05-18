@@ -6,9 +6,15 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <linux/ioctl.h>
+#include <pthread.h>
 
 
-double eval_dim_with_controller_with_commad(int dim, double state[], double command[]) {
+pthread_mutex_t start_simulation;
+pthread_mutex_t lock_actuator_update;
+pthread_mutex_t lock_sensor;
+
+double eval_dim_with_controller_with_commad(int dim, double state[],
+                                            double command[]) {
 
 //    double p1 = -1.0000;
 //    double p2 = -2.4000;
@@ -37,7 +43,7 @@ double eval_dim_with_controller_with_commad(int dim, double state[], double comm
     } else if (dim == 2) {
         rv = dy;
     } else if (dim == 3) {
-        rv = p8 * command[0] + p8 * command[1];
+        rv = -0.15 + p8 * command[0] + p8 * command[1];
     } else if (dim == 4) {
         rv = p9 * command[0] - p9 * command[1];
     } else if (dim == 5) {
@@ -48,21 +54,60 @@ double eval_dim_with_controller_with_commad(int dim, double state[], double comm
 }
 
 
-
-void simulate(double state[], double command[], double time){
+void simulate(double state[], double command[], double time) {
     double d_state[6];
-    for (int i = 0 ;i < 6; i ++){
+    for (int i = 0; i < 6; i++) {
         d_state[i] = eval_dim_with_controller_with_commad(i, state, command);
     }
 
-    for (int i=0; i<6;i++){
-        state[i] = state[i] + d_state[i]*time;
+    for (int i = 0; i < 6; i++) {
+        state[i] = state[i] + d_state[i] * time;
     }
 }
 
+double actuator_volts[2] = {0, 0};
+int sensor_reading[6];
 
-int
-set_interface_attribs(int fd, int speed, int parity) {
+
+void simulator() {
+    double system_state[6] = {-0.3, 0, 0, 0, 0, 0};
+    double actuator_volts_local[2];
+
+    int time = 0;
+    printf("%f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
+           system_state[2], system_state[3], system_state[4], system_state[5]);
+    while (1) {
+        pthread_mutex_lock(&start_simulation);
+        pthread_mutex_unlock(&start_simulation);
+
+        time++;
+        if (time % 500 == 0) {
+            printf("\nstate is: %f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
+                   system_state[2], system_state[3], system_state[4],
+                   system_state[5]);
+            time = 0;
+        }
+        pthread_mutex_lock(&lock_actuator_update);
+        actuator_volts_local[0] = actuator_volts[0];
+        actuator_volts_local[1] = actuator_volts[1];
+        pthread_mutex_unlock(&lock_actuator_update);
+
+        simulate(system_state, actuator_volts, 0.001);
+
+        pthread_mutex_lock(&lock_sensor);
+        for (int i = 0; i < 6; i++) {
+            sensor_reading[i] = (int) (system_state[i] * 10000.0);
+//            printf("%d,%d,%d,%d,%d,%d\n", sensor_reading[0],sensor_reading[1],sensor_reading[2],sensor_reading[3],sensor_reading[4],sensor_reading[5]);
+        }
+        pthread_mutex_unlock(&lock_sensor);
+        fflush(stdout);
+        usleep(1000);
+    }
+
+}
+
+
+int set_interface_attribs(int fd, int speed, int parity) {
     struct termios tty;
     memset(&tty, 0, sizeof tty);
     if (tcgetattr(fd, &tty) != 0) {
@@ -143,17 +188,17 @@ unsigned char receive_bytes(int fd, int *commands) {
 }
 
 
-void send_serial(int fd, int sensor_readings[]) {
+void send_serial(int fd, int values[]) {
     unsigned char Txbuffer[24];
 
     for (int i = 0; i < 6; i++) {
-        Txbuffer[4 * i] = (unsigned char) (sensor_readings[i] &
+        Txbuffer[4 * i] = (unsigned char) (values[i] &
                                            0xff); /* first byte */
-        Txbuffer[4 * i + 1] = (unsigned char) (sensor_readings[i] >> 8 &
+        Txbuffer[4 * i + 1] = (unsigned char) (values[i] >> 8 &
                                                0xff); /* second byte */
-        Txbuffer[4 * i + 2] = (unsigned char) (sensor_readings[i] >> 16 &
+        Txbuffer[4 * i + 2] = (unsigned char) (values[i] >> 16 &
                                                0xff); /* third byte */
-        Txbuffer[4 * i + 3] = (unsigned char) (sensor_readings[i] >> 24 &
+        Txbuffer[4 * i + 3] = (unsigned char) (values[i] >> 24 &
                                                0xff); /* fourth byte */
     }
 
@@ -166,10 +211,18 @@ void send_serial(int fd, int sensor_readings[]) {
 
 void main() {
 
+
+    if (pthread_mutex_init(&lock_actuator_update, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
+
+    if (pthread_mutex_init(&lock_sensor, NULL) != 0) {
+        printf("\n mutex init has failed\n");
+        return 1;
+    }
+
     int commands[2];
-    int sensor_reading[6];
-    double system_state[6];
-    double actuator_volts[2];
 
     char *portname = "/dev/ttyACM0";
     printf("starting ... \n");
@@ -222,59 +275,58 @@ void main() {
 
     printf("\n\nstarting to get commands\n\n");
 
+    pthread_t thread1;
+    int iret1;
+
+    pthread_mutex_lock(&start_simulation);
+    iret1 = pthread_create(&thread1, NULL, simulator, fd);
+
+    if (iret1) {
+        fprintf(stderr, "Error - pthread_create() return code: %d\n", iret1);
+        return;
+    }
+    printf("pthread_create() for thread 1 returns: %d\n", iret1);
+
+
     int first_time = 1;
+    struct timeval last_time, now;
+    double time_diff;
+
+    int sensor_reading_local[6];
+
     while (1) {
 
         set_blocking(fd, 1, 1);
         int n = (int) read(fd, &cc, 1);
 
-        struct timeval last_time, now;
         if (cc == 0xcc) {
-            gettimeofday(&last_time, NULL);
-            first_time = 0;
 
             receive_bytes(fd, commands);
-            actuator_volts[0] = commands[0]/10000.0;
-            actuator_volts[1] = commands[1]/10000.0;
+            pthread_mutex_lock(&lock_actuator_update);
+            actuator_volts[0] = commands[0] / 10000.0;
+            actuator_volts[1] = commands[1] / 10000.0;
+            pthread_mutex_unlock(&lock_actuator_update);
+//          printf("recieved: \t %lf, %lf\n", actuator_volts[0], actuator_volts[1]);
 
-//            printf("recieved: \t %lf, %lf\n", actuator_volts[0], actuator_volts[1]);
         } else if (cc == 0xaa) {
-            gettimeofday(&now, NULL);
-            double time_diff;
-            if (first_time){
-                time_diff = 0;
-            }else{
-                time_diff = (now.tv_sec - last_time.tv_sec) +
-                                   (double)(now.tv_usec - last_time.tv_usec)/1000000;
+
+            pthread_mutex_unlock(&start_simulation);
+            pthread_mutex_lock(&lock_sensor);
+            for (int j = 0; j < 6; j++) {
+                sensor_reading_local[j] = sensor_reading[j];
             }
 
-            printf("time diff is: %lf\n", time_diff);
+            pthread_mutex_unlock(&lock_sensor);
+            send_serial(fd, sensor_reading_local);
 
-            simulate(system_state, actuator_volts, time_diff);
+//          printf("sending: \t %d, %d, %d, %d, %d, %d\n", sensor_reading_local[0], sensor_reading_local[1], sensor_reading_local[2], sensor_reading_local[3], sensor_reading_local[4], sensor_reading_local[5]);
 
-            for (int i = 0 ; i < 6 ; i ++){
-                sensor_reading[i] = (int) (system_state[i] * 10000.0);
-            }
-
-//            printf("sending: \t %d, %d, %d\n", system_state[0], system_state[1], system_state[2]);
-            send_serial(fd, sensor_reading);
+        } else {
+            printf("%c", cc);
         }
     }
 
 
-//    pthread_t thread1;
-//    int iret1;
-//
-//    /* Create independent threads each of which will execute function */
-//
-//    iret1 = pthread_create(&thread1, NULL, sender, fd);
-//    if (iret1) {
-//        fprintf(stderr, "Error - pthread_create() return code: %d\n", iret1);
-//        return;
-//    }
-//
-//    printf("pthread_create() for thread 1 returns: %d\n", iret1);
-//
-//    pthread_join(thread1, NULL);
+    pthread_join(thread1, NULL);
 
 }

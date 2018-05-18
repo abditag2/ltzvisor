@@ -164,24 +164,30 @@ void safe_controller() {
 
     read_from_serial(&sensors);
 
-    double d_elevation = sensors[0]/10000.0;
-    double d_pitch = sensors[1]/10000.0;
-    double d_travel = sensors[2]/10000.0;
+    double elevation = sensors[0]/10000.0;
+    double pitch = sensors[1]/10000.0;
+    double travel = sensors[2]/10000.0;
 
-    double elevation = sensors[3]/10000.0;
-    double pitch = sensors[4]/10000.0;
-    double travel = sensors[5]/10000.0;
+    double d_elevation = sensors[3]/10000.0;
+    double d_pitch = sensors[4]/10000.0;
+    double d_travel = sensors[5]/10000.0;
+
 
     double vol_left =
-            - 6.5 * elevation
-            - 0.801 * pitch
-            - 200.0 * PERIOD * d_elevation
-            - 20.0 * PERIOD * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
+            - 5.4617 * elevation
+            - 1.7907 * pitch
+            - 2.6956 * d_elevation
+            - 0.4738 * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
 
-    double vol_right = -6.5 * elevation +
-           0.6701 * pitch -
-           200.0 * PERIOD * d_elevation +
-           24.0 * PERIOD * d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
+    double vol_right =
+            -5.5698 * elevation
+            + 1.9211 * pitch
+            - 2.7146 * d_elevation
+            + 0.4659 * d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
+
+//    To compensate for gravity effect
+    vol_left += 0.325;
+    vol_right += 0.325;
 
     float_volts[0] = (int) (vol_left * 10000);
     float_volts[1] = (int) (vol_right * 10000);
