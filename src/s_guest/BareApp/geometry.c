@@ -16,8 +16,8 @@ double interval_width(Interval* i)
 double hyperrectange_max_width(HyperRectangle* rect)
 {
 	double rv = 0;
-
-	for (int d = 0; d < NUM_DIMS; ++d)
+	int d;
+	for (d = 0; d < NUM_DIMS; ++d)
 	{
 		double min = rect->dims[d].min;
 		double max = rect->dims[d].max;
@@ -39,8 +39,8 @@ double hyperrectange_max_width(HyperRectangle* rect)
 bool hyperrectangle_contains(HyperRectangle* outside, HyperRectangle* inside, bool printErrors)
 {
 	bool rv = true;
-
-	for (int d = 0; d < NUM_DIMS; ++d)
+	int d;
+	for (d = 0; d < NUM_DIMS; ++d)
 	{
 		if ((inside->dims[d].min < outside->dims[d].min) || (inside->dims[d].max > outside->dims[d].max))
 		{
@@ -66,7 +66,8 @@ bool hyperrectangle_contains(HyperRectangle* outside, HyperRectangle* inside, bo
 
 void hyperrectangle_grow_to_convex_hull(HyperRectangle* grower, HyperRectangle* contained)
 {
-	for (int d = 0; d < NUM_DIMS; ++d)
+	int d;
+	for (d = 0; d < NUM_DIMS; ++d)
 	{
 		if (contained->dims[d].min < grower->dims[d].min)
 			grower->dims[d].min = contained->dims[d].min;
@@ -79,7 +80,8 @@ void hyperrectangle_grow_to_convex_hull(HyperRectangle* grower, HyperRectangle* 
 
 void hyperrectangle_bloat(HyperRectangle* out, double from[NUM_DIMS], double width)
 {
-	for (int d = 0; d < NUM_DIMS; ++d)
+	int d;
+	for (d = 0; d < NUM_DIMS; ++d)
 	{
 		out->dims[d].min = from[d] - width;
 		out->dims[d].max = from[d] + width;

@@ -87,7 +87,8 @@ void led_blink(void *parameters) {
 //
 //    }
 
-    for (int kk = 0; kk < 10; kk++) {
+    int kk;
+    for (kk = 0; kk < 10; kk++) {
         YIELD()
     }
 
@@ -105,7 +106,8 @@ void led_blink(void *parameters) {
     for (;;) {
 
         read_from_serial(sensors);
-        for (int i = 0 ; i < 6; i ++){
+        int i;
+        for (i = 0 ; i < 6; i ++){
             sensors_double[i] = sensors[i]/10000.0;
         }
 

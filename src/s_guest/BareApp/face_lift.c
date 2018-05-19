@@ -68,8 +68,8 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	double nebWidth[NUM_FACES];
 
 	// initially, estimate nebWidth based on the derivative in the center of the rectangle we care about
-
-	for (int f = 0; f < NUM_FACES; ++f)
+	int f;
+	for (f = 0; f < NUM_FACES; ++f)
 		nebWidth[f] = 0;
 
 	bool needRecompute = true;
@@ -79,8 +79,8 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 	{
 		needRecompute = false;
 		minNebCrossTime = 1000000.0;
-
-		for (int f = 0; f < NUM_FACES; ++f)
+		int f;
+		for (f = 0; f < NUM_FACES; ++f)
 		{
 
 			int dim = f / 2;
@@ -176,7 +176,8 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 		timeToElapse = timeRemaining;
 
 	// do the lifting
-	for (int d = 0; d < NUM_DIMS; ++d)
+	int d;
+	for (d = 0; d < NUM_DIMS; ++d)
 	{
 		rect->dims[d].min += ders[2*d] * timeToElapse;
 		rect->dims[d].max += ders[2*d+1] * timeToElapse;
@@ -200,7 +201,8 @@ double lift_single_rect(HyperRectangle* rect, double stepSize, double timeRemain
 void generateSplitRectangle(HyperRectangle* rectToSplit, HyperRectangle* out,
 		int iteratorVal, int splitDimensions[NUM_DIMS])
 {
-	for (int dimIndex = 0; dimIndex < NUM_DIMS; ++dimIndex)
+	int dimIndex;
+	for (dimIndex = 0; dimIndex < NUM_DIMS; ++dimIndex)
 	{
 		int mask = splitDimensions[dimIndex];
 //		int splitNum = iteratorVal % mask;

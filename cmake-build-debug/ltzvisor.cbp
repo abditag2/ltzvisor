@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="ltzvisor"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/fardin/devel/ltzvisor/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/fardin/devel/ltzvisor/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/fardin/devel/ltzvisor/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ltzvisor">
+				<Option output="/home/fardin/devel/ltzvisor/cmake-build-debug/ltzvisor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/fardin/devel/ltzvisor/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 ltzvisor"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ltzvisor/fast">
+				<Option output="/home/fardin/devel/ltzvisor/cmake-build-debug/ltzvisor" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/fardin/devel/ltzvisor/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 ltzvisor/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/fardin/devel/ltzvisor/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/Cortex-A9/inc/platform_asm.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/asm-offsets.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/cpu_handlers.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/cpu_helper.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/cpu_stack.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/asm-offsets.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_cp15_switch.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_defines.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_handlers.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_helper.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_stack.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/cpu_vcpu.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/arch/armv7/inc/types.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/board.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/inc/board.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/inc/ltzvisor_hw.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/inc/platform_zynq.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/inc/zynq_ttc.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/inc/zynq_uart.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/ltzvisor_hw.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/zynq_ttc.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zc702/zynq_uart.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/board.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/inc/board.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/inc/ltzvisor_hw.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/inc/platform_zynq.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/inc/zynq_ttc.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/inc/zynq_uart.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/ltzvisor_hw.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/zynq_ttc.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zedboard/zynq_uart.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/board.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/inc/board.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/inc/ltzvisor_hw.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/inc/platform_zynq.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/inc/zynq_ttc.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/inc/zynq_uart.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/ltzvisor_hw.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/zynq_ttc.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/boards/zybo/zynq_uart.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/core/inc/ltzvisor.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/core/inc/ltzvisor_api.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/core/inc/ltzvisor_syscall_asm.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/core/ltzvisor.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/core/ltzvisor_api.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/common/gic.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/common/inc/gic.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/gic.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/inc/gic.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/board.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/inc/board.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/inc/ltzvisor_hw.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/inc/platform_zynq.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/inc/xilinx_uart.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/inc/zynq_ttc.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/ltzvisor_hw.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/xilinx_uart.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/drivers/zynq/zynq_ttc.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/inc/io.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/inc/math.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/inc/printk.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/inc/string.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/io.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/printk.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/lib/string.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/ns_guest/inc/ltzvisor_nsguest_config.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/ns_guest/ltzvisor_nsguest_config.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/blink.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/inc/blink.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/inc/util.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/portable/hw_zynq.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/portable/inc/hw_zynq.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/portable/inc/s_isr.h">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/portable/s_isr.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/src/s_guest/BareApp/util.c">
+			<Option target="ltzvisor"/>
+		</Unit>
+		<Unit filename="/home/fardin/devel/ltzvisor/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

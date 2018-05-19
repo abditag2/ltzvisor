@@ -69,6 +69,25 @@ double actuator_volts[2] = {0, 0};
 int sensor_reading[6];
 
 
+void write_to_file(double system_state[]){
+
+    FILE *f = fopen("state.csv", "a");
+    if (f == NULL)
+    {
+        printf("error printing file\n");
+        return;
+    }
+
+
+    /* print some text */
+    fprintf(f,"%f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
+            system_state[2], system_state[3], system_state[4],
+            system_state[5]);
+
+    fflush(f);
+    fclose(f);vim
+}
+
 void simulator() {
     double system_state[6] = {-0.3, 0, 0, 0, 0, 0};
     double actuator_volts_local[2];
@@ -86,6 +105,8 @@ void simulator() {
                    system_state[2], system_state[3], system_state[4],
                    system_state[5]);
             time = 0;
+            write_to_file(system_state);
+
         }
         pthread_mutex_lock(&lock_actuator_update);
         actuator_volts_local[0] = actuator_volts[0];
@@ -210,6 +231,7 @@ void send_serial(int fd, int values[]) {
 
 
 void main() {
+
 
 
     if (pthread_mutex_init(&lock_actuator_update, NULL) != 0) {

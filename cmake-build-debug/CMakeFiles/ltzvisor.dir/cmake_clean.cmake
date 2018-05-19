@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/ltzvisor.dir/src/arch/armv7/asm-offsets.c.o"
+  "CMakeFiles/ltzvisor.dir/src/arch/armv7/cpu_handlers.c.o"
+  "CMakeFiles/ltzvisor.dir/src/arch/armv7/cpu_helper.c.o"
+  "CMakeFiles/ltzvisor.dir/src/arch/armv7/cpu_stack.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zc702/board.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zc702/ltzvisor_hw.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zc702/zynq_ttc.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zc702/zynq_uart.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zedboard/board.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zedboard/ltzvisor_hw.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zedboard/zynq_ttc.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zedboard/zynq_uart.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zybo/board.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zybo/ltzvisor_hw.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zybo/zynq_ttc.c.o"
+  "CMakeFiles/ltzvisor.dir/src/boards/zybo/zynq_uart.c.o"
+  "CMakeFiles/ltzvisor.dir/src/core/ltzvisor.c.o"
+  "CMakeFiles/ltzvisor.dir/src/core/ltzvisor_api.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/common/gic.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/zynq/board.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/zynq/ltzvisor_hw.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/zynq/xilinx_uart.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/zynq/zynq_ttc.c.o"
+  "CMakeFiles/ltzvisor.dir/src/drivers/gic.c.o"
+  "CMakeFiles/ltzvisor.dir/src/lib/io.c.o"
+  "CMakeFiles/ltzvisor.dir/src/lib/printk.c.o"
+  "CMakeFiles/ltzvisor.dir/src/lib/string.c.o"
+  "CMakeFiles/ltzvisor.dir/src/ns_guest/ltzvisor_nsguest_config.c.o"
+  "CMakeFiles/ltzvisor.dir/src/s_guest/BareApp/portable/hw_zynq.c.o"
+  "CMakeFiles/ltzvisor.dir/src/s_guest/BareApp/portable/s_isr.c.o"
+  "CMakeFiles/ltzvisor.dir/src/s_guest/BareApp/blink.c.o"
+  "CMakeFiles/ltzvisor.dir/src/s_guest/BareApp/util.c.o"
+  "ltzvisor.pdb"
+  "ltzvisor"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang C)
+  include(CMakeFiles/ltzvisor.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

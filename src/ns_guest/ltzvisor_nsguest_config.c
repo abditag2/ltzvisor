@@ -54,7 +54,8 @@ extern uint32_t GPOS0_start, GPOS0_end;
 /** Config structure according to NS Guest */
 struct nsguest_conf_entry nsguest_config[] ={
 	{
-		.gce_name = "Linux 3.3 (vanilla)",
+//		.gce_name = "Linux 3.3 (vanilla)",
+ 		.gce_name = "baremetal_hello",
 		.gce_id = 0,
 		/* No ram disk needed */
 		.gce_trd_init = 0,
