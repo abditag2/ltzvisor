@@ -235,7 +235,7 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
 
         if (time_of_timer_1() > 542){
             printk("time_of_timer_1() is %d\n", time_of_timer_1());
-            while(1);
+//            while(1);
         }
 
         if ( 542 - time_of_timer_1() < 542 ){
@@ -286,7 +286,7 @@ bool face_lifting_iterative_improvement(LiftingSettings* settings) {
     {
         if (time_of_timer_1() > 542){
             printk("at return %d\n", time_of_timer_1());
-            while(1);
+//            while(1);
         }
 
         if ( 542 - time_of_timer_1() < 542 ){

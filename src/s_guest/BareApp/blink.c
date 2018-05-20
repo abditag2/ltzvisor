@@ -74,19 +74,6 @@ float C[HX_SIZE][1];
  */
 void led_blink(void *parameters) {
 
-//    char init_signal[5];
-//
-//    while(1){
-//        char c1 = uart_getc(1);
-//        char c2 = uart_getc(1);
-//        char c3 = uart_getc(1);
-////        printk("cs are: %c, %c, %c\n", c1, c2, c3);
-//        if ( c1 == 's' && c2 == 's' && c3 == 's'){
-//            break;
-//        }
-//
-//    }
-
     int kk;
     for (kk = 0; kk < 10; kk++) {
         YIELD()
@@ -115,11 +102,13 @@ void led_blink(void *parameters) {
 
         toggle ^= 0xFF;
         *ptr = toggle;
-        tick_set((int) (res * 1000000));
 
+        printk("res is: ");
         double2string(res);
         printk("\n");
-        if (res > 0){
+
+        if (res > 0.0){
+            tick_set((int) (res * 1000000.0));
             YIELD()
         }
     }

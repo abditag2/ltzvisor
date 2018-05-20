@@ -3,7 +3,6 @@
 //
 
 #include "inc/util.h"
-#define PERIOD 0.02
 
 extern int safe_call_count;
 
@@ -96,62 +95,25 @@ void write_to_serial(int float_volts[]) {
     }
 }
 
-//
-//
-//void matrix_mult(double A[HX_SIZE][6], double B[6][1], int m, int n, int k) {
-//
-//    int r = 0;
-//    int c = 0;
-//    int kk = 0;
-//    for (r = 0; r < m; r++) {
-//        for (c = 0; c < n; c++) {
-//            C[r][c] = 0;
-//            for (kk = 0; kk < k; kk++) {
-//                C[r][c] += A[r][kk] * B[kk][c];
-//            }
-//        }
-//    }
-//
-//}
-//
-//
-//double voltage_max_min(double voltage) {
-//
-//    if (voltage > MAX_VOLTAGE)
-//        voltage = MAX_VOLTAGE;
-//        //else if (voltage < 0)
-//        //	voltage = 0;
-//    else if (voltage < -MAX_VOLTAGE)
-//        voltage = -MAX_VOLTAGE;
-//    return voltage;
-//}
-//
-//
 void read_from_serial(int *sensor_readings) {
 
-    char rxChar1[24];
+    unsigned char rxChar1[24];
     char rxChar = 0xAA;
-
 
     uart_putc(1, rxChar);
     wait();
 
     for (int i = 0; i < 24; i++) {
         rxChar1[i] = uart_getc(1);
-        wait();
+//        wait();
     }
 
-
-    sensor_readings[0] = *(unsigned int *) &rxChar1[0];
-    sensor_readings[1] = *(unsigned int *) &rxChar1[4];
-    sensor_readings[2] = *(unsigned int *) &rxChar1[8];
-    sensor_readings[3] = *(unsigned int *) &rxChar1[12];
-    sensor_readings[4] = *(unsigned int *) &rxChar1[16];
-    sensor_readings[5] = *(unsigned int *) &rxChar1[20];
-
-//    printk("sensor1: %d\n", sensor_readings[0]);
-//    printk("sensor2: %d\n", sensor_readings[1]);
-//    printk("sensor3: %d\n", sensor_readings[2]);
+    sensor_readings[0] = *(int *) &rxChar1[0];
+    sensor_readings[1] = *(int *) &rxChar1[4];
+    sensor_readings[2] = *(int *) &rxChar1[8];
+    sensor_readings[3] = *(int *) &rxChar1[12];
+    sensor_readings[4] = *(int *) &rxChar1[16];
+    sensor_readings[5] = *(int *) &rxChar1[20];
 
     return;
 }
@@ -164,17 +126,17 @@ void safe_controller() {
 
     read_from_serial(&sensors);
 
-    double elevation = sensors[0]/10000.0;
-    double pitch = sensors[1]/10000.0;
-    double travel = sensors[2]/10000.0;
+    double elevation = ((double) sensors[0]) / 10000.0;
+    double pitch = ((double) sensors[1]) / 10000.0;
+    double travel = ((double) sensors[2]) / 10000.0;
 
-    double d_elevation = sensors[3]/10000.0;
-    double d_pitch = sensors[4]/10000.0;
-    double d_travel = sensors[5]/10000.0;
+    double d_elevation = ((double) sensors[3]) / 10000.0;
+    double d_pitch = ((double) sensors[4]) / 10000.0;
+    double d_travel = ((double) sensors[5]) / 10000.0;
 
 
     double vol_left =
-            - 5.4617 * elevation
+            -5.4617 * elevation
             - 1.7907 * pitch
             - 2.6956 * d_elevation
             - 0.4738 * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
@@ -189,9 +151,18 @@ void safe_controller() {
     vol_left += 0.325;
     vol_right += 0.325;
 
-    float_volts[0] = (int) (vol_left * 10000);
-    float_volts[1] = (int) (vol_right * 10000);
+    printk("el %d\n", (int) (elevation * 10000.0));
+    printk("pi %d\n", (int) (pitch * 10000.0));
+    printk("de %d \n", (int) (d_elevation * 10000.0));
+    printk("dp %d \n", (int) (d_pitch * 10000.0));
 
+    float_volts[0] = (int) (vol_left * 10000.0);
+    float_volts[1] = (int) (vol_right * 10000.0);
+
+    printk("vl %d \n", float_volts[0]);
+    printk("vr %d \n", float_volts[1]);
+
+    printk("trusted\n");
     write_to_serial(float_volts);
 
 

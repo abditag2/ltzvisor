@@ -69,18 +69,17 @@ double actuator_volts[2] = {0, 0};
 int sensor_reading[6];
 
 
-void write_to_file(double system_state[]){
+void write_to_file(double system_state[]) {
 
     FILE *f = fopen("state.csv", "a");
-    if (f == NULL)
-    {
+    if (f == NULL) {
         printf("error printing file\n");
         return;
     }
 
 
     /* print some text */
-    fprintf(f,"%f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
+    fprintf(f, "%f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
             system_state[2], system_state[3], system_state[4],
             system_state[5]);
 
@@ -90,18 +89,32 @@ void write_to_file(double system_state[]){
 
 void simulator() {
     double system_state[6] = {-0.3, 0, 0, 0, 0, 0};
+
+    pthread_mutex_lock(&lock_sensor);
+    for (int i = 0; i < 6; i++) {
+        sensor_reading[i] = (int) (system_state[i] * 10000.0);
+//            printf("%d,%d,%d,%d,%d,%d\n", sensor_reading[0],sensor_reading[1],sensor_reading[2],sensor_reading[3],sensor_reading[4],sensor_reading[5]);
+    }
+    pthread_mutex_unlock(&lock_sensor);
+
     double actuator_volts_local[2];
 
     int time = 0;
+
+    pthread_mutex_lock(&start_simulation);
+    pthread_mutex_unlock(&start_simulation);
+
+    printf("\n\nstarting to get commands\n\n");
+
     printf("%f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
            system_state[2], system_state[3], system_state[4], system_state[5]);
+
     while (1) {
-        pthread_mutex_lock(&start_simulation);
-        pthread_mutex_unlock(&start_simulation);
 
         time++;
         if (time % 500 == 0) {
-            printf("\nstate is: %f,%f,%f,%f,%f,%f\n", system_state[0], system_state[1],
+            printf("\nstate is: %f,%f,%f,%f,%f,%f\n", system_state[0],
+                   system_state[1],
                    system_state[2], system_state[3], system_state[4],
                    system_state[5]);
             time = 0;
@@ -229,9 +242,20 @@ void send_serial(int fd, int values[]) {
 
 }
 
+# define MAX_VOLTAGE 2
+#define MIN_VOLTAGE -2
+
+double voltage_max_min(double voltage) {
+
+    if (voltage > MAX_VOLTAGE)
+        voltage = MAX_VOLTAGE;
+    else if (voltage < -MAX_VOLTAGE)
+        voltage = -MAX_VOLTAGE;
+    return voltage;
+}
+
 
 void main() {
-
 
 
     if (pthread_mutex_init(&lock_actuator_update, NULL) != 0) {
@@ -271,15 +295,16 @@ void main() {
     }
 
     write(fd, c1, 8);
-    sleep(1);
     printf("sent c1\n");
-    write(fd, c2, 38);
     sleep(1);
+
+    write(fd, c2, 38);
     printf("sent c2\n");
+    sleep(1);
+
     write(fd, c3, 14);
     printf("sent c3\n");
     sleep(1);
-
 
     set_blocking(fd, 0, 0);
     unsigned char cc;
@@ -295,11 +320,10 @@ void main() {
         printf("%c", cc);
     }
 
-    printf("\n\nstarting to get commands\n\n");
-
     pthread_t thread1;
     int iret1;
 
+//   Do not start simulation until the first command.
     pthread_mutex_lock(&start_simulation);
     iret1 = pthread_create(&thread1, NULL, simulator, fd);
 
@@ -322,17 +346,31 @@ void main() {
         int n = (int) read(fd, &cc, 1);
 
         if (cc == 0xcc) {
-
             receive_bytes(fd, commands);
             pthread_mutex_lock(&lock_actuator_update);
-            actuator_volts[0] = commands[0] / 10000.0;
-            actuator_volts[1] = commands[1] / 10000.0;
+
+            actuator_volts[0] = voltage_max_min(commands[0] / 10000.0);
+            actuator_volts[1] = voltage_max_min(commands[1] / 10000.0);
+
             pthread_mutex_unlock(&lock_actuator_update);
-//          printf("recieved: \t %lf, %lf\n", actuator_volts[0], actuator_volts[1]);
+            printf("recieved: \t %lf, %lf\n", actuator_volts[0],
+                   actuator_volts[1]);
 
         } else if (cc == 0xaa) {
 
+            // When safety controller is reading
             pthread_mutex_unlock(&start_simulation);
+            pthread_mutex_lock(&lock_sensor);
+
+            for (int j = 0; j < 6; j++) {
+                sensor_reading_local[j] = sensor_reading[j];
+            }
+
+            pthread_mutex_unlock(&lock_sensor);
+            send_serial(fd, sensor_reading_local);
+          printf("sending to trusted: \t %d, %d, %d, %d, %d, %d\n", sensor_reading_local[0], sensor_reading_local[1], sensor_reading_local[2], sensor_reading_local[3], sensor_reading_local[4], sensor_reading_local[5]);
+        } else if (cc == 0xbb) {
+            // When untrusted controller is reading
             pthread_mutex_lock(&lock_sensor);
             for (int j = 0; j < 6; j++) {
                 sensor_reading_local[j] = sensor_reading[j];
@@ -340,9 +378,7 @@ void main() {
 
             pthread_mutex_unlock(&lock_sensor);
             send_serial(fd, sensor_reading_local);
-
-//          printf("sending: \t %d, %d, %d, %d, %d, %d\n", sensor_reading_local[0], sensor_reading_local[1], sensor_reading_local[2], sensor_reading_local[3], sensor_reading_local[4], sensor_reading_local[5]);
-
+            printf("sending to untrusted: \t %d, %d, %d, %d, %d, %d\n", sensor_reading_local[0], sensor_reading_local[1], sensor_reading_local[2], sensor_reading_local[3], sensor_reading_local[4], sensor_reading_local[5]);
         } else {
             printf("%c", cc);
         }

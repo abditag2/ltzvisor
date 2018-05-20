@@ -11,8 +11,12 @@
 
 #define NUM_DIMS (6)
 
-#define U_MAX (0.3)
-#define U_MIN (-0.3)
+//#define U_MAX (0.3)
+//#define U_MIN (-0.3)
+
+#define U_MAX (2.0)
+#define U_MIN (-2.0)
+
 
 #define COMPLEX_CONTROLLER (0)
 #define SIMPLE_CONTROLLER (1)
