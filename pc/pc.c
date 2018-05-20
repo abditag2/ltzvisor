@@ -85,7 +85,7 @@ void write_to_file(double system_state[]){
             system_state[5]);
 
     fflush(f);
-    fclose(f);vim
+    fclose(f);
 }
 
 void simulator() {
