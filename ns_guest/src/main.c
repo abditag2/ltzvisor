@@ -3,7 +3,6 @@
 void init_platform();
 
 
-
 extern int safe_call_count;
 
 void double2string(double num) {
@@ -98,25 +97,58 @@ void write_to_serial(int float_volts[]) {
 
 void read_from_serial(int *sensor_readings) {
 
-    char rxChar1[24];
+    unsigned char rxChar1[24];
     char rxChar = 0xBB;
+    char recieved;
+    unsigned char crc = 0;
+    unsigned char recievd_crc = 0;
 
 
-    uart_putc(1, rxChar);
-    wait();
-    int i;
-    for ( i = 0; i < 24; i++) {
-        rxChar1[i] = uart_getc(1);
+    int i ;
+    while(1){
+
+        uart_putc(1, rxChar);
         wait();
+        printk("waiting for bb: ");
+        while(1){
+            recieved = uart_getc(1);
+            printk("%d ", recieved);
+            if (recieved == 0xFB){
+                break;
+            }
+        }
+        printk("done!\n");
+
+        printk("BB sent and reading : ");
+        crc = 0;
+        for (i = 0; i < 24; i++) {
+            rxChar1[i] = uart_getc(1);
+            printk("%d ", rxChar1[i]);
+            crc = crc + rxChar1[i];
+        }
+        printk("!\n");
+        recievd_crc = uart_getc(1);
+        printk("crc is %d calc crc: %d\n", recievd_crc, crc);
+        if (recievd_crc == crc){
+            printk("Crc match\n");
+            break;
+        }
+        printk("Crc didn't match\n");
     }
 
+    printk("got insec: ");
+    for (i = 0 ; i < 24; i++){
+        printk("%d ", rxChar1[i]);
+    }
+    printk("\n");
 
-    sensor_readings[0] = *(unsigned int *) &rxChar1[0];
-    sensor_readings[1] = *(unsigned int *) &rxChar1[4];
-    sensor_readings[2] = *(unsigned int *) &rxChar1[8];
-    sensor_readings[3] = *(unsigned int *) &rxChar1[12];
-    sensor_readings[4] = *(unsigned int *) &rxChar1[16];
-    sensor_readings[5] = *(unsigned int *) &rxChar1[20];
+
+    sensor_readings[0] = *(int *) &rxChar1[0];
+    sensor_readings[1] = *(int *) &rxChar1[4];
+    sensor_readings[2] = *(int *) &rxChar1[8];
+    sensor_readings[3] = *(int *) &rxChar1[12];
+    sensor_readings[4] = *(int *) &rxChar1[16];
+    sensor_readings[5] = *(int *) &rxChar1[20];
 
     return;
 }
@@ -129,36 +161,49 @@ void untrusted_controller() {
 
     read_from_serial(&sensors);
 
-    double elevation = sensors[0]/10000.0;
-    double pitch = sensors[1]/10000.0;
-    double travel = sensors[2]/10000.0;
+    double elevation = sensors[0] / 10000.0;
+    double pitch = sensors[1] / 10000.0;
+    double travel = sensors[2] / 10000.0;
 
-    double d_elevation = sensors[3]/10000.0;
-    double d_pitch = sensors[4]/10000.0;
-    double d_travel = sensors[5]/10000.0;
+    double d_elevation = sensors[3] / 10000.0;
+    double d_pitch = sensors[4] / 10000.0;
+    double d_travel = sensors[5] / 10000.0;
 
     double vol_left =
-            - 5.4617 * elevation
+            -10.4617 * (elevation - 0.1)
             - 1.7907 * pitch
             - 2.6956 * d_elevation
-            - 0.4738 * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
+            -
+            0.4738 * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
 
     double vol_right =
-            -5.5698 * elevation
+            -10.5698 * (elevation - 0.1)
             + 1.9211 * pitch
             - 2.7146 * d_elevation
             + 0.4659 * d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
 
 //    To compensate for gravity effect
-//    vol_left += 0.325 ;
-//    vol_right += 0.325;
+    vol_left += 0.325;
+    vol_right += 0.325;
 
-    vol_left = -2 ;
-    vol_right = -2;
+
+    printk("el %d\n", (int) (elevation * 10000.0));
+    printk("pi %d\n", (int) (pitch * 10000.0));
+    printk("de %d \n", (int) (d_elevation * 10000.0));
+    printk("dp %d \n", (int) (d_pitch * 10000.0));
+
+
+
+//    vol_left = +2 ;
+//    vol_right = -2;
 
 
     float_volts[0] = (int) (vol_left * 10000);
     float_volts[1] = (int) (vol_right * 10000);
+
+    printk("vl %d \n", float_volts[0]);
+    printk("vr %d \n", float_volts[1]);
+
 
     write_to_serial(float_volts);
 
@@ -170,37 +215,36 @@ void untrusted_controller() {
 }
 
 
-void main()
-{
-	static int counter = 0;
-	int i = 0;
-	int j = 0;
-	init_platform();
-	printk("Non-Secure bare metal VM: running ... \n\r");
+void main() {
+    static int counter = 0;
+    int i = 0;
+    int j = 0;
+    init_platform();
+    printk("Non-Secure bare metal VM: running ... \n\r");
 
-    for(i = 0; i < 12000; i++){
-        for(j = 0; j < 2000; j++){
+    for (i = 0; i < 12000; i++) {
+        for (j = 0; j < 2000; j++) {
             /* Do nothing */
         }
     }
 
-	while(1){
+    while (1) {
 
         printk("untrusted\n", counter++);
         untrusted_controller();
 
-		for(i = 0; i < 50; i++){
-			for(j = 0; j < 1000; j++){
-				/* Do nothing */
-			}
-		}
-	}
+        for (i = 0; i < 50; i++) {
+            for (j = 0; j < 1000; j++) {
+                /* Do nothing */
+            }
+        }
+    }
 
-	// END!!!
-	while(1);
+    // END!!!
+    while (1);
 }
 
 
-void init_platform(){
+void init_platform() {
 
 }

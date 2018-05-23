@@ -227,7 +227,7 @@ double findMaxRestartTime(double state[NUM_DIMS], double reachTimeSC){
 //
     //then find the minimum restart time
     double prevSafeReachTimeCC = 0;
-    reachTimeCC = 0.1;
+    reachTimeCC = 0.3;
 
     for (int k= 0 ; k < 3; k++){
         safe = isSafe(state, reachTimeCC, reachTimeSC, &simTime);

@@ -98,15 +98,53 @@ void write_to_serial(int float_volts[]) {
 void read_from_serial(int *sensor_readings) {
 
     unsigned char rxChar1[24];
-    char rxChar = 0xAA;
+    char rxChar = 0xaa;
+    char recieved;
+    unsigned char crc = 0;
+    unsigned char recievd_crc = 0;
 
-    uart_putc(1, rxChar);
-    wait();
 
-    for (int i = 0; i < 24; i++) {
-        rxChar1[i] = uart_getc(1);
-//        wait();
+    while(1){
+
+        printk("waiting for aa and FD: ");
+        wait();
+        wait();
+        wait();
+
+        uart_putc(1, rxChar);
+        wait();
+
+        while(1){
+            recieved = uart_getc(1);
+            printk("%d ", recieved);
+            if (recieved == 0xFD){
+                break;
+            }
+        }
+        printk("done!\n");
+        crc = 0;
+        printk("AA sent and reading\n");
+        for (int i = 0; i < 24; i++) {
+            rxChar1[i] = uart_getc(1);
+            printk("%d ", rxChar1[i]);
+            crc = crc + rxChar1[i];
+        }
+        printk("\n");
+        recievd_crc = uart_getc(1);
+        printk("crc is %d calc crc: %d\n", recievd_crc, crc);
+        if (recievd_crc == crc){
+            printk("Crc match\n");
+            break;
+        }
+        printk("Crc didn't match\n");
     }
+
+    printk("got sec: ");
+    for (int i = 0 ; i < 24; i++){
+        printk("%d ", rxChar1[i]);
+    }
+    printk("\n");
+
 
     sensor_readings[0] = *(int *) &rxChar1[0];
     sensor_readings[1] = *(int *) &rxChar1[4];
@@ -123,6 +161,7 @@ void safe_controller() {
 
     int sensors[6];
     int float_volts[2];
+    printk("trusted\n");
 
     read_from_serial(&sensors);
 
@@ -162,7 +201,6 @@ void safe_controller() {
     printk("vl %d \n", float_volts[0]);
     printk("vr %d \n", float_volts[1]);
 
-    printk("trusted\n");
     write_to_serial(float_volts);
 
 
