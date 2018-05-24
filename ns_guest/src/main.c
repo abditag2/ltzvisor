@@ -94,14 +94,16 @@ void write_to_serial(int float_volts[]) {
     }
 }
 
+double new_cc_set_point_double = 0.0;
 
 void read_from_serial(int *sensor_readings) {
 
-    unsigned char rxChar1[24];
+    unsigned char rxChar1[29];
     char rxChar = 0xBB;
     char recieved;
     unsigned char crc = 0;
     unsigned char recievd_crc = 0;
+    int new_cc_set_point_int = 0;
 
 
     int i;
@@ -121,7 +123,7 @@ void read_from_serial(int *sensor_readings) {
 
         printk("BB sent and reading : ");
         crc = 0;
-        for (i = 0; i < 24; i++) {
+        for (i = 0; i < 29; i++) {
             rxChar1[i] = uart_getc(1);
             printk("%d ", rxChar1[i]);
             crc = crc + rxChar1[i];
@@ -137,7 +139,7 @@ void read_from_serial(int *sensor_readings) {
     }
 
     printk("got insec: ");
-    for (i = 0; i < 24; i++) {
+    for (i = 0; i < 29; i++) {
         printk("%d ", rxChar1[i]);
     }
     printk("\n");
@@ -150,13 +152,25 @@ void read_from_serial(int *sensor_readings) {
     sensor_readings[4] = *(int *) &rxChar1[16];
     sensor_readings[5] = *(int *) &rxChar1[20];
 
+    printk(" before ");
+    if (rxChar1[24] == 0xF9) {
+        printk("here ");
+
+        new_cc_set_point_int = (int) ((unsigned char) (rxChar1[25]) |
+                                      (unsigned char) (rxChar1[26]) << 8 |
+                                      (unsigned char) (rxChar1[27]) << 16 |
+                                      (unsigned char) (rxChar1[28]) << 24);
+
+        printk("new cc 2 is %d\n", new_cc_set_point_int);
+        new_cc_set_point_double = (double) (new_cc_set_point_int / 10000.0);
+    }
+
+    printk(" cc_set is :");
+    double2string(new_cc_set_point_double);
+    printk("\n");
+
     return;
 }
-
-
-
-float travel_int = 0;
-
 
 void untrusted_controller() {
 
@@ -173,14 +187,11 @@ void untrusted_controller() {
     double d_pitch = sensors[4] / 10000.0;
     double d_travel = sensors[5] / 10000.0;
 
-
-    travel_int = travel_int + (travel - 0.2) * 0.1;
-
 //    Right is positive for travel
     double vol_left =
-            -10.4617 * (elevatio)
+            -10.4617 * (elevation)
             - 1.7907 * pitch
-            - 5 * (travel - 0.2)
+            - 5 * (travel - new_cc_set_point_double)
             - 2.6956 * d_elevation
             - 0.4738 * d_pitch
             - 12.6 * d_travel;
@@ -188,7 +199,7 @@ void untrusted_controller() {
     double vol_right =
             -10.5698 * (elevation)
             + 1.9211 * pitch
-            + 5 * (travel - 0.2)
+            + 5 * (travel - new_cc_set_point_double)
             - 2.7146 * d_elevation
             + 0.4659 * d_pitch
             + 12.6 * d_travel;
@@ -197,6 +208,8 @@ void untrusted_controller() {
     vol_left += 0.325;
     vol_right += 0.325;
 
+//    vol_left = -2;
+//    vol_right = 2;
 
     printk("el %d\n", (int) (elevation * 10000.0));
     printk("pi %d\n", (int) (pitch * 10000.0));

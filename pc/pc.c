@@ -91,6 +91,18 @@ void write_to_file(double system_state[]) {
     fclose(f);
 }
 
+int cc_set_point = 0;
+int is_there_cc_new_setpoint = 0;
+
+void get_new_cc_setpoint() {
+    double new_setpoint_double = 0;
+    while (1) {
+        scanf("%lf", &new_setpoint_double);
+        cc_set_point = (int) (new_setpoint_double * 10000.0);
+        is_there_cc_new_setpoint = 1;
+    }
+}
+
 void simulator() {
     double system_state[6] = {-0.3, 0, 0, 0, 0, 0};
 
@@ -227,7 +239,7 @@ unsigned char receive_bytes(int fd, int *commands) {
 
 
 void send_serial(int fd, int values[], int target) {
-    unsigned char Txbuffer[24];
+    unsigned char Txbuffer[29];
     unsigned char safety[1];
     unsigned char crc[1] = {0};
 
@@ -241,8 +253,46 @@ void send_serial(int fd, int values[], int target) {
         Txbuffer[4 * i + 3] = (unsigned char) (values[i] >> 24 &
                                                0xff); /* fourth byte */
     }
+
+    int num_chars_to_send = 0;
+    if (target == TO_COMPLETE_UNSAFE_CONTROLLER) {
+
+        Txbuffer[24] = 0xFA;
+        Txbuffer[25] = 0;
+        Txbuffer[26] = 0;
+        Txbuffer[27] = 0;
+        Txbuffer[28] = 0;
+
+        num_chars_to_send = 29;
+
+    } else if (target == TO_UNSAFE_CONTROLLER) {
+        if (is_there_cc_new_setpoint) {
+            Txbuffer[24] = 0xF9;
+
+            Txbuffer[25] = (unsigned char) (cc_set_point &
+                                            0xff); /* first byte */
+            Txbuffer[26] = (unsigned char) (cc_set_point >> 8 &
+                                            0xff); /* second byte */
+            Txbuffer[27] = (unsigned char) (cc_set_point >> 16 &
+                                            0xff); /* third byte */
+            Txbuffer[28] = (unsigned char) (cc_set_point >> 24 &
+                                            0xff); /* fourth byte */
+
+        } else {
+            Txbuffer[24] = 0xFA;
+            Txbuffer[25] = 0;
+            Txbuffer[26] = 0;
+            Txbuffer[27] = 0;
+            Txbuffer[28] = 0;
+        }
+        num_chars_to_send = 29;
+
+    } else if(target == TO_SAFETY_CONTROLLER){
+        num_chars_to_send = 24;
+    }
+
     printf("sending chars: ");
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < num_chars_to_send; i++) {
         printf("%d ", Txbuffer[i]);
         crc[0] = crc[0] + Txbuffer[i];
     }
@@ -252,14 +302,15 @@ void send_serial(int fd, int values[], int target) {
     if (target == TO_SAFETY_CONTROLLER) {
         safety[0] = 0xFD;
         write(fd, safety, 1);
-    } else if (target == TO_UNSAFE_CONTROLLER || target == TO_COMPLETE_UNSAFE_CONTROLLER) {
+    } else if (target == TO_UNSAFE_CONTROLLER ||
+               target == TO_COMPLETE_UNSAFE_CONTROLLER) {
         safety[0] = 0xFB;
         write(fd, safety, 1);
     }
 
-    write(fd, Txbuffer, 24);
+    write(fd, Txbuffer, num_chars_to_send);
 
-    if (target == TO_COMPLETE_UNSAFE_CONTROLLER){
+    if (target == TO_COMPLETE_UNSAFE_CONTROLLER) {
 //        If this case, send the wrong crc.
         crc[0] = 17;
     }
@@ -348,12 +399,13 @@ void main() {
         printf("%c", cc);
     }
 
-    pthread_t thread1;
-    int iret1;
+    pthread_t thread1, thread2;
+    int iret1, iret2;
 
 //   Do not start simulation until the first command.
     pthread_mutex_lock(&start_simulation);
     iret1 = pthread_create(&thread1, NULL, simulator, fd);
+    iret2 = pthread_create(&thread2, NULL, get_new_cc_setpoint, fd);
 
     if (iret1) {
         fprintf(stderr, "Error - pthread_create() return code: %d\n", iret1);

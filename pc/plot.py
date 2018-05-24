@@ -55,7 +55,7 @@ def live_update_demo(blit = False):
     f.close()
 
 
-    for i in np.arange(1000):
+    while(True):
         # h1.set_data(np.sin(X/3.+k)*np.cos(Y/3.+k))
 
         f = open(filePath,'r+')
