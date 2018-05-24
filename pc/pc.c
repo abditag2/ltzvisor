@@ -50,7 +50,7 @@ double eval_dim_with_controller_with_commad(int dim, double state[],
     } else if (dim == 4) {
         rv = p9 * command[0] - p9 * command[1];
     } else if (dim == 5) {
-        rv = (command[0] + command[1]) * state[1] * 0.2;
+        rv = (command[0] + command[1]) * state[1] * 0.5;
 //        rv = 0;
     }
 
@@ -116,7 +116,7 @@ void simulator() {
     while (1) {
 
         time++;
-        if (time % 500 == 0) {
+        if (time % 100 == 0) {
             printf("\nstate is: %f,%f,%f,%f,%f,%f\n", system_state[0],
                    system_state[1],
                    system_state[2], system_state[3], system_state[4],

@@ -92,12 +92,14 @@ void led_blink(void *parameters) {
     double res;
     for (;;) {
 
+        toggle ^= 0xFF;
+        *ptr = toggle;
+
         read_from_serial(sensors);
         int i;
         for (i = 0 ; i < 6; i ++){
             sensors_double[i] = sensors[i]/10000.0;
         }
-
         res = findMaxRestartTime(sensors_double, reachTimeSC);
 
         toggle ^= 0xFF;

@@ -104,16 +104,16 @@ void read_from_serial(int *sensor_readings) {
     unsigned char recievd_crc = 0;
 
 
-    int i ;
-    while(1){
+    int i;
+    while (1) {
 
         uart_putc(1, rxChar);
         wait();
         printk("waiting for bb: ");
-        while(1){
+        while (1) {
             recieved = uart_getc(1);
             printk("%d ", recieved);
-            if (recieved == 0xFB){
+            if (recieved == 0xFB) {
                 break;
             }
         }
@@ -129,7 +129,7 @@ void read_from_serial(int *sensor_readings) {
         printk("!\n");
         recievd_crc = uart_getc(1);
         printk("crc is %d calc crc: %d\n", recievd_crc, crc);
-        if (recievd_crc == crc){
+        if (recievd_crc == crc) {
             printk("Crc match\n");
             break;
         }
@@ -137,7 +137,7 @@ void read_from_serial(int *sensor_readings) {
     }
 
     printk("got insec: ");
-    for (i = 0 ; i < 24; i++){
+    for (i = 0; i < 24; i++) {
         printk("%d ", rxChar1[i]);
     }
     printk("\n");
@@ -152,6 +152,10 @@ void read_from_serial(int *sensor_readings) {
 
     return;
 }
+
+
+
+float travel_int = 0;
 
 
 void untrusted_controller() {
@@ -169,18 +173,25 @@ void untrusted_controller() {
     double d_pitch = sensors[4] / 10000.0;
     double d_travel = sensors[5] / 10000.0;
 
+
+    travel_int = travel_int + (travel - 0.2) * 0.1;
+
+//    Right is positive for travel
     double vol_left =
-            -10.4617 * (elevation - 0.1)
+            -10.4617 * (elevatio)
             - 1.7907 * pitch
+            - 5 * (travel - 0.2)
             - 2.6956 * d_elevation
-            -
-            0.4738 * d_pitch; //-0.0333*cs->int_elevation -0.001*cs->int_pitch;
+            - 0.4738 * d_pitch
+            - 12.6 * d_travel;
 
     double vol_right =
-            -10.5698 * (elevation - 0.1)
+            -10.5698 * (elevation)
             + 1.9211 * pitch
+            + 5 * (travel - 0.2)
             - 2.7146 * d_elevation
-            + 0.4659 * d_pitch; //-0.03*cs->int_elevation +0.001*cs->int_pitch;
+            + 0.4659 * d_pitch
+            + 12.6 * d_travel;
 
 //    To compensate for gravity effect
     vol_left += 0.325;
